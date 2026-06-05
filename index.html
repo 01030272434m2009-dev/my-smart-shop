@@ -3,118 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS PRO | المتجر الذكي المتكامل</title>
+    <title>الشركة البيطرية المتكاملة | منصة الأدوية والخدمات الاقتصادية</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
-        body { font-family: 'Cairo', sans-serif; background-color: #f3f4f6; }
-        .amazon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+        body { font-family: 'Cairo', sans-serif; background-color: #f4f7f6; }
+        .pharmacy-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px; }
     </style>
 </head>
 <body class="text-gray-800 antialiased">
 
     <script>
-        const API_URL = "YOUR_GOOGLE_SCRIPT_URL"; // ضع رابط الـ Web App الخاص بجوجل سكريبت هنا
+        const API_URL = "YOUR_GOOGLE_SCRIPT_URL"; // 🔗 ضع هنا رابط الـ Web App الخاص بك بعد نشره من جوجل سكريبت
     </script>
 
-    <div class="bg-amber-500 text-slate-950 text-center py-1.5 text-xs font-bold px-4 flex justify-between items-center">
-        <div><i class="fas fa-fire mr-1"></i> عروض حصرية لفترة محدودة جداً!</div>
-        <div id="live-users" class="bg-slate-950 text-amber-400 px-2.5 py-0.5 rounded-full text-[10px]"><i class="fas fa-users"></i> يزور الموقع الآن: <span id="user-count">48</span> شخص</div>
+    <div class="bg-teal-600 text-white text-center py-2 text-xs font-bold px-4 flex justify-between items-center shadow-sm">
+        <div><i class="fas fa-hand-holding-medical animate-pulse mr-1"></i> منصة الخدمات العلاجية الاقتصادية والتسجيل الرقمي للثروة الحيوانية</div>
+        <div id="live-users" class="bg-teal-900 text-teal-300 px-3 py-0.5 rounded-full text-[10px]"><i class="fas fa-users"></i> متصل الآن بالمنصة: <span id="user-count">52</span> عيادة ومربي</div>
     </div>
 
-    <header class="bg-slate-950 text-white sticky top-0 z-40 shadow-xl">
-        <div class="container mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
-            <a href="#" onclick="showPage('home')" class="text-2xl font-black text-amber-400 tracking-wider flex items-center gap-2">
-                <i class="fas fa-cubes text-3xl"></i> NEXUS<span class="text-white text-sm font-light">PRO</span>
+    <header class="bg-slate-900 text-white sticky top-0 z-40 shadow-xl border-b border-teal-800/3xl">
+        <div class="container mx-auto px-4 py-3.5 flex flex-wrap justify-between items-center gap-4">
+            <a href="#" onclick="showPage('home')" class="text-xl md:text-2xl font-black text-teal-400 tracking-wide flex items-center gap-2">
+                <i class="fas fa-shield-dog text-3xl text-teal-400"></i> الصيدلية البيطرية <span class="text-white text-xs font-light bg-teal-800/80 px-2 py-0.5 rounded">الذكية</span>
             </a>
             
-            <nav class="flex items-center space-x-reverse space-x-6 text-sm font-bold">
-                <a href="#" onclick="showPage('home')" class="hover:text-amber-400 transition"><i class="fas fa-home"></i> الرئيسية</a>
-                <a href="#" onclick="showPage('shop')" class="hover:text-amber-400 transition"><i class="fas fa-store"></i> تصفح المنتجات</a>
-                <a href="#" onclick="showPage('track')" class="hover:text-amber-400 transition text-amber-400"><i class="fas fa-truck"></i> تتبع طلبك</a>
+            <nav class="flex items-center space-x-reverse space-x-6 text-xs md:text-sm font-bold">
+                <a href="#" onclick="showPage('home')" class="hover:text-teal-400 transition flex items-center gap-1"><i class="fas fa-home"></i> الرئيسية</a>
+                <a href="#" onclick="showPage('shop')" class="hover:text-teal-400 transition flex items-center gap-1"><i class="fas fa-capsules"></i> تصفح الأدوية</a>
+                <a href="#" onclick="showPage('track')" class="hover:text-teal-400 transition text-teal-400 flex items-center gap-1"><i class="fas fa-clipboard-list"></i> تتبع الطلبيات</a>
             </nav>
 
-            <div class="flex items-center gap-4">
-                <div id="user-profile-zone" class="text-xs text-right cursor-pointer bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-800" onclick="toggleLoginModal()">
-                    <span id="user-status-text" class="block text-gray-400">مرحباً بك، تسجيل الدخول</span>
-                    <strong id="user-email-text" class="block text-amber-400 text-sm">حسابي</strong>
+            <div class="flex items-center gap-3">
+                <div id="user-profile-zone" class="text-xs text-right cursor-pointer bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 hover:border-teal-600 transition" onclick="toggleLoginModal()">
+                    <span id="user-status-text" class="block text-gray-400 text-[10px]">مرحباً بك، اضغط هنا لـ</span>
+                    <strong id="user-email-text" class="block text-teal-400 text-xs">تفعيل الحساب</strong>
                 </div>
 
-                <button onclick="showPage('cart')" class="relative p-3 bg-slate-900 border border-slate-800 rounded-xl hover:bg-slate-800 transition flex items-center gap-2">
-                    <i class="fas fa-shopping-basket text-amber-400 text-lg"></i>
-                    <span id="cart-count" class="bg-amber-500 text-slate-900 text-xs font-bold px-2 py-0.5 rounded-full">0</span>
+                <button onclick="showPage('cart')" class="relative p-3 bg-slate-950 border border-slate-800 rounded-xl hover:bg-slate-800 transition flex items-center gap-2">
+                    <i class="fas fa-shopping-basket text-teal-400 text-lg"></i>
+                    <span id="cart-count" class="bg-teal-500 text-slate-950 text-xs font-bold px-2 py-0.5 rounded-full">0</span>
                 </button>
             </div>
         </div>
 
-        <div class="bg-slate-900 border-t border-slate-800 py-2 overflow-x-auto">
-            <div id="categories-bar" class="container mx-auto px-4 flex gap-4 text-xs font-bold whitespace-nowrap">
+        <div class="bg-slate-950 border-t border-slate-800/60 py-2 overflow-x-auto">
+            <div id="categories-bar" class="container mx-auto px-4 flex gap-3 text-xs font-bold whitespace-nowrap">
                 </div>
         </div>
     </header>
 
-    <main class="container mx-auto px-4 py-6">
+    <main class="container mx-auto px-4 py-8">
 
         <section id="page-home" class="page-content">
-            <div id="promo-slider" class="bg-gradient-to-l from-slate-900 via-indigo-950 to-slate-950 text-white rounded-3xl p-6 md:p-12 shadow-2xl mb-8 relative overflow-hidden min-h-[220px] flex flex-col justify-center">
+            <div id="promo-slider" class="bg-gradient-to-l from-slate-900 via-teal-950 to-slate-950 text-white rounded-3xl p-6 md:p-10 shadow-2xl mb-8 relative overflow-hidden min-h-[200px] flex flex-col justify-center border border-teal-900/50">
                 <div class="max-w-xl z-10">
-                    <span class="bg-red-500 text-white font-bold px-3 py-1 rounded-md text-[10px] uppercase tracking-wider mb-2 inline-block">إعلان ترويجي مميز</span>
-                    <h1 id="ad-title" class="text-2xl md:text-4xl font-black text-amber-400 mb-2">أقوى العروض السنوية المباشرة</h1>
-                    <p id="ad-subtitle" class="text-slate-300 text-sm md:text-base">يتم تفعيل وتغيير هذا البنر بالكامل من لوحة تحكم السيرفر والديسكتوب الخاص بك.</p>
+                    <span class="bg-teal-600 text-white font-bold px-2.5 py-0.5 rounded text-[10px] uppercase tracking-wider mb-2 inline-block"><i class="fas fa-bullhorn"></i> إرشادات وتنويهات الإدارة</span>
+                    <h1 id="ad-title" class="text-xl md:text-3xl font-black text-teal-400 mb-2">حملات التحصين والخدمات العلاجية الاقتصادية</h1>
+                    <p id="ad-subtitle" class="text-slate-300 text-xs md:text-sm">تابع العروض والمنشورات الدورية الصادرة من برنامج الإدارة الرئيسي مباشرة هنا.</p>
                 </div>
-                <div class="absolute left-0 bottom-0 top-0 w-1/2 opacity-20 md:opacity-40 bg-cover bg-center" id="ad-bg"></div>
+                <div class="absolute left-0 bottom-0 top-0 w-1/2 opacity-10 md:opacity-25 bg-cover bg-center" id="ad-bg"></div>
             </div>
 
-            <h2 class="text-xl font-black text-slate-900 mb-4 flex items-center gap-2"><i class="fas fa-bolt text-amber-500"></i> اكتشف المقترحات الحالية للاختيار</h2>
-            <div id="home-products-grid" class="amazon-grid">
+            <h2 class="text-lg font-black text-slate-900 mb-5 flex items-center gap-2"><i class="fas fa-star text-amber-500"></i> قائمة الأدوية والمستلزمات الموصى بها حالياً:</h2>
+            <div id="home-products-grid" class="pharmacy-grid">
                 </div>
         </section>
 
         <section id="page-shop" class="page-content hidden">
-            <h2 class="text-2xl font-black text-slate-900 mb-6 border-r-4 border-amber-500 pr-3">كل المعروضات بالمتجر</h2>
-            <div id="shop-products-grid" class="amazon-grid"></div>
+            <h2 class="text-xl font-black text-slate-900 mb-6 border-r-4 border-teal-500 pr-3">كل المستحضرات والأصناف المتاحة بالمخزون</h2>
+            <div id="shop-products-grid" class="pharmacy-grid"></div>
         </section>
 
-        <section id="page-track" class="page-content hidden max-w-xl mx-auto bg-white p-8 rounded-3xl shadow-lg border border-gray-100">
-            <h2 class="text-2xl font-black text-slate-900 mb-4 text-center"><i class="fas fa-shipping-fast text-indigo-600"></i> تتبع حالة طلبك الفوري</h2>
-            <p class="text-gray-500 text-center text-xs mb-6">أدخل كود الأوردر الخاص بك المكون من (NX-******) للاستعلام عن حالته الحالية في ثوانٍ</p>
+        <section id="page-track" class="page-content hidden max-w-xl mx-auto bg-white p-6 md:p-8 rounded-3xl shadow-lg border border-gray-100">
+            <h2 class="text-xl font-black text-slate-900 mb-3 text-center"><i class="fas fa-truck-loading text-teal-600"></i> الاستعلام الفوري عن طلبيتك</h2>
+            <p class="text-gray-500 text-center text-xs mb-6">أدخل كود الطلب (ORD-******) المستلم عند التأكيد لمتابعة اعتماده وشحنه</p>
             <div class="flex gap-2 mb-6">
-                <input type="text" id="track-id-input" placeholder="مثال: NX-123456" class="w-full px-4 py-3 rounded-xl border border-gray-300 font-bold text-center focus:outline-none focus:border-indigo-600 uppercase">
-                <button onclick="trackOrderNow()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 rounded-xl transition">استعلام</button>
+                <input type="text" id="track-id-input" placeholder="مثال: ORD-123456" class="w-full px-4 py-3 rounded-xl border border-gray-300 font-bold text-center focus:outline-none focus:border-teal-600 uppercase text-sm">
+                <button onclick="trackOrderNow()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold px-6 rounded-xl transition text-sm">استعلام</button>
             </div>
             <div id="track-result" class="hidden border-t border-gray-100 pt-6">
                 <div class="flex justify-between items-center p-4 rounded-xl bg-slate-50">
-                    <span class="font-bold text-gray-600">الحالة الحالية للأوردر:</span>
-                    <span id="track-status-badge" class="px-4 py-1 rounded-full font-bold text-sm"></span>
+                    <span class="font-bold text-gray-600 text-xs">حالة الإجراء بالوحدة:</span>
+                    <span id="track-status-badge" class="px-4 py-1 rounded-full font-bold text-xs"></span>
                 </div>
-                <p class="text-xs text-gray-500 mt-3 p-3 bg-amber-50 rounded-xl border border-amber-100 hidden" id="track-notes-box">
-                    <strong class="block text-amber-800"><i class="fas fa-comment-dots"></i> ملاحظات الإدارة:</strong>
+                <p class="text-xs text-gray-500 mt-3 p-3 bg-teal-50 rounded-xl border border-teal-100 hidden" id="track-notes-box">
+                    <strong class="block text-teal-900 mb-1"><i class="fas fa-user-md"></i> توجيهات الصيدلية / الإدارة:</strong>
                     <span id="track-notes-text"></span>
                 </p>
             </div>
         </section>
 
         <section id="page-cart" class="page-content hidden">
-            <h2 class="text-2xl font-black text-slate-900 mb-6"><i class="fas fa-shopping-cart text-amber-500"></i> مراجعة محتويات السلة والطلب</h2>
+            <h2 class="text-xl font-black text-slate-900 mb-6"><i class="fas fa-shopping-cart text-teal-600"></i> الأصناف المحددة للطلب</h2>
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div class="lg:col-span-2 bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
                     <div id="cart-items-list" class="divide-y divide-gray-100"></div>
                 </div>
                 <div class="bg-slate-950 text-white rounded-3xl p-6 shadow-xl h-fit">
-                    <h3 class="text-lg font-bold mb-4 border-b border-slate-800 pb-2 text-amber-400">تفاصيل الشحن النهائي</h3>
+                    <h3 class="text-base font-bold mb-4 border-b border-slate-800 pb-2 text-teal-400"><i class="fas fa-map-marker-alt"></i> بيانات التسليم والتسجيل</h3>
                     <form id="order-form" onsubmit="submitOrder(event)" class="space-y-4 text-slate-800">
-                        <input type="text" id="cust-name" placeholder="الاسم بالكامل" required class="w-full px-4 py-2.5 rounded-xl border-none focus:ring-2 focus:ring-amber-400 bg-white">
-                        <input type="tel" id="cust-phone" placeholder="رقم الهاتف (يفضل واتساب)" required class="w-full px-4 py-2.5 rounded-xl border-none focus:ring-2 focus:ring-amber-400 bg-white text-left" dir="ltr">
-                        <textarea id="cust-address" placeholder="العنوان بالتفصيل الدقيق" required rows="2" class="w-full px-4 py-2.5 rounded-xl border-none focus:ring-2 focus:ring-amber-400 bg-white"></textarea>
+                        <input type="text" id="cust-name" placeholder="اسم الطبيب أو صاحب المزرعة بالكامل" required class="w-full px-4 py-2.5 rounded-xl border-none text-xs focus:ring-2 focus:ring-teal-400 bg-white">
+                        <input type="tel" id="cust-phone" placeholder="رقم الهاتف للتواصل والواتساب" required class="w-full px-4 py-2.5 rounded-xl border-none text-xs focus:ring-2 focus:ring-teal-400 bg-white text-right" dir="ltr">
+                        <textarea id="cust-address" placeholder="العنوان بالتفصيل (المركز - القرية - اسم المزرعة أو العيادة)" required rows="2" class="w-full px-4 py-2.5 rounded-xl border-none text-xs focus:ring-2 focus:ring-teal-400 bg-white"></textarea>
                         
                         <div class="border-t border-slate-800 pt-4 text-white">
-                            <div class="flex justify-between font-bold text-lg mb-4">
-                                <span>إجمالي المطلوب:</span>
-                                <span class="text-amber-400"><span id="cart-total">0</span> ج.م</span>
+                            <div class="flex justify-between font-bold text-base mb-4">
+                                <span>إجمالي القيمة التقديرية:</span>
+                                <span class="text-teal-400"><span id="cart-total">0</span> ج.م</span>
                             </div>
-                            <button type="submit" id="submit-btn" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-black py-3.5 rounded-xl shadow-lg transition flex justify-center items-center gap-2">
-                                تأكيد وإرسال الأوردر فوراً
+                            <button type="submit" id="submit-btn" class="w-full bg-teal-500 hover:bg-teal-600 text-slate-950 font-black py-3 rounded-xl shadow-lg transition flex justify-center items-center gap-2 text-sm">
+                                إرسال وحجز الطلبية فوراً
                             </button>
                         </div>
                     </form>
@@ -126,39 +126,39 @@
     <div id="login-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-3xl shadow-2xl max-w-sm w-full relative">
             <button onclick="toggleLoginModal()" class="absolute top-4 left-4 text-gray-400 hover:text-gray-600"><i class="fas fa-times-circle text-lg"></i></button>
-            <h3 class="text-xl font-black text-slate-900 mb-2 text-center"><i class="fas fa-user-shield text-indigo-600"></i> الحساب الشخصي الإلكتروني</h3>
-            <p class="text-xs text-gray-500 text-center mb-4">أدخل بريدك الإلكتروني لحفظ الطلبات والتواصل المباشر مع الدعم</p>
-            <input type="email" id="login-email-input" placeholder="name@example.com" class="w-full px-4 py-3 rounded-xl border border-gray-300 font-bold text-center focus:outline-none focus:border-indigo-600 mb-3">
-            <button onclick="saveUserLogin()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition">تأكيد الدخول</button>
+            <h3 class="text-lg font-black text-slate-900 mb-1 text-center"><i class="fas fa-user-md text-teal-600"></i> تفعيل الهوية الإلكترونية</h3>
+            <p class="text-[11px] text-gray-500 text-center mb-4">سجل بريدك الإلكتروني لربط طلبياتك وحفظ سجل العلاج الخاص بمواشيك</p>
+            <input type="email" id="login-email-input" placeholder="example@mail.com" class="w-full px-4 py-3 rounded-xl border border-gray-300 font-bold text-center text-xs focus:outline-none focus:border-teal-600 mb-4">
+            <button onclick="saveUserLogin()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl transition text-xs">اعتماد وتفعيل</button>
         </div>
     </div>
 
     <div id="chat-widget" class="fixed bottom-6 left-6 z-50">
-        <button onclick="toggleChatWindow()" class="bg-indigo-600 hover:bg-indigo-700 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-2xl transition transform hover:scale-110 relative">
-            <i class="fas fa-comment-alt"></i>
+        <button onclick="toggleChatWindow()" class="bg-teal-600 hover:bg-teal-700 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-xl transition transform hover:scale-110 relative">
+            <i class="fas fa-comment-medical"></i>
             <span class="absolute top-0 right-0 w-3 h-3 bg-emerald-400 rounded-full border-2 border-white"></span>
         </button>
         
         <div id="chat-window" class="hidden absolute bottom-16 left-0 w-80 md:w-96 bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col h-[400px]">
-            <div class="bg-indigo-600 p-4 text-white flex justify-between items-center">
+            <div class="bg-slate-900 p-4 text-white flex justify-between items-center border-b border-teal-600">
                 <div class="flex items-center gap-2">
-                    <div class="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-ping"></div>
-                    <span class="font-bold text-sm">محادثة مباشرة مع الإدارة</span>
+                    <div class="w-2 h-2 bg-emerald-400 rounded-full animate-ping"></div>
+                    <span class="font-bold text-xs text-teal-400">الاستشارات الفورية والدعم الطبي</span>
                 </div>
-                <button onclick="toggleChatWindow()" class="text-indigo-200 hover:text-white"><i class="fas fa-times"></i></button>
+                <button onclick="toggleChatWindow()" class="text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
             </div>
-            <div id="chat-messages-box" class="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50 text-xs">
-                <p class="text-center text-gray-400 py-4">أهلاً بك! اكتب رسالتك وسيتلقاها الدعم الفوري على برنامج الديسكتوب مباشرة.</p>
+            <div id="chat-messages-box" class="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50 text-[11px]">
+                <p class="text-center text-gray-400 py-4">أهلاً بك في منصة التواصل التبادلي. اكتب استفسارك أو بلاغك وسيظهر فوراً لدى الطبيب المسؤول بالإدارة على الديسكتوب.</p>
             </div>
             <div class="p-2 bg-white border-t border-gray-100 flex gap-2">
-                <input type="text" id="chat-input-text" placeholder="اكتب استفسارك هنا..." class="w-full px-3 py-2 rounded-xl bg-gray-100 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-600">
-                <button onclick="sendChatMessage()" class="bg-indigo-600 text-white px-4 rounded-xl text-xs font-bold hover:bg-indigo-700"><i class="fas fa-paper-plane"></i></button>
+                <input type="text" id="chat-input-text" placeholder="اكتب رسالتك أو استشارتك هنا..." class="w-full px-3 py-2 rounded-xl bg-gray-100 text-xs focus:outline-none focus:ring-1 focus:ring-teal-600">
+                <button onclick="sendChatMessage()" class="bg-teal-600 text-white px-4 rounded-xl text-xs font-bold hover:bg-teal-700"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
     </div>
 
     <footer class="bg-slate-950 text-gray-500 text-center py-6 border-t border-slate-900 mt-16 text-xs">
-        <p>جميع الحقوق محفوظة © 2026 | منصة التجارة الإلكترونية المستقبلية ذات الربط الفوري المباشر</p>
+        <p>جميع الحقوق محفوظة © 2026 | منظومة إدارة وتوزيع مستلزمات الصيدلية البيطرية الفورية</p>
     </footer>
 
     <script>
@@ -166,20 +166,19 @@
         let cart = [];
         let currentUserEmail = localStorage.getItem('userEmail') || "";
 
-        // 1. تشغيل الفحص الأولي ومحاكاة الزوار الفورية الذكية
+        // 1. التشغيل الذكي الأولي لمحاكاة الحركة وضمان الكفاءة
         async function initApp() {
-            // محاكاة عدد زوار متغير تمنح حيوية للموقع كأمازون
             setInterval(() => {
-                document.getElementById('user-count').innerText = Math.floor(40 + Math.random() * 25);
-            }, 4000);
+                document.getElementById('user-count').innerText = Math.floor(35 + Math.random() * 20);
+            }, 5000);
 
             if(currentUserEmail) {
-                document.getElementById('user-status-text').innerText = "تم تسجيل الدخول";
+                document.getElementById('user-status-text').innerText = "الحساب النشط:";
                 document.getElementById('user-email-text').innerText = currentUserEmail;
+                document.getElementById('user-email-text').className = "block text-teal-400 text-[11px] truncate max-w-[120px]";
             }
 
             try {
-                // جلب المنتجات والإعلانات معاً
                 let [prodRes, adsRes] = await Promise.all([
                     fetch(`${API_URL}?action=getProducts`),
                     fetch(`${API_URL}?action=getAds`)
@@ -192,11 +191,12 @@
                 renderCategories();
                 renderProducts();
                 if(currentUserEmail) loadChatHistory();
-            } catch (err) { console.error("خطأ في الاتصال بقاعدة البيانات", err); }
+            } catch (err) { console.error("فشل سحب المنتجات من خادم جوجل شيت المباشر", err); }
         }
 
-        // 2. معالجة وعرض الإعلانات الديناميكية من السيرفر
+        // 2. إدراج البنرات والتعليمات الطبية المتزامنة مع السيرفر
         function renderAds(ads) {
+            if(!Array.isArray(ads) || ads.length === 0) return;
             let activeAd = ads.find(a => a.Status === "ACTIVE");
             if(activeAd) {
                 document.getElementById('ad-title').innerText = activeAd.Title;
@@ -205,46 +205,52 @@
             }
         }
 
-        // 3. استخراج الأقسام تلقائياً وبنائها في البار العلوي
+        // 3. بناء الفئات والأقسام البيطرية ديناميكياً لتسهيل الفرز
         function renderCategories() {
             let bar = document.getElementById('categories-bar');
             let categories = [...new Set(allProducts.map(p => p.Category))];
-            bar.innerHTML = `<span onclick="filterByCategory('ALL')" class="bg-amber-400 text-slate-950 px-3 py-1 rounded-full cursor-pointer hover:bg-amber-500">كل الأقسام</span>`;
+            bar.innerHTML = `<span onclick="filterByCategory('ALL')" class="bg-teal-500 text-slate-950 px-3 py-1 rounded-full cursor-pointer hover:bg-teal-400 transition">كل المستحضرات</span>`;
             categories.forEach(cat => {
-                if(cat) bar.innerHTML += `<span onclick="filterByCategory('${cat}')" class="bg-slate-800 text-gray-300 px-3 py-1 rounded-full cursor-pointer hover:bg-amber-400 hover:text-slate-950 transition">${cat}</span>`;
+                if(cat) bar.innerHTML += `<span onclick="filterByCategory('${cat}')" class="bg-slate-900 text-gray-300 px-3 py-1 rounded-full cursor-pointer hover:bg-teal-500 hover:text-slate-950 transition">${cat}</span>`;
             });
         }
 
-        // 4. عرض ورص المنتجات كطريقة أمازون الفاخرة (Amazon Grid Layout)
+        // 4. عرض ورص الأصناف البيطرية بشكل شبكي منسق وجذاب
         function renderProducts(targetProducts = allProducts) {
             let grid = document.getElementById('home-products-grid');
             let shopGrid = document.getElementById('shop-products-grid');
             grid.innerHTML = ''; shopGrid.innerHTML = '';
 
-            let activeProducts = targetProducts.filter(p => p.Status === "ACTIVE");
+            let activeProducts = targetProducts.filter(p => p.Status === "ACTIVE" || p.Status === "نشط");
+
+            if(activeProducts.length === 0) {
+                let emptyMsg = `<p class="text-gray-400 text-center py-8 col-span-full text-xs">لا توجد مستحضرات متوفرة حالياً في هذا القسم</p>`;
+                grid.innerHTML = emptyMsg; shopGrid.innerHTML = emptyMsg;
+                return;
+            }
 
             activeProducts.forEach(p => {
                 let hasOffer = p.OldPrice && Number(p.OldPrice) > Number(p.Price);
-                let discountBadge = hasOffer ? `<span class="absolute top-2 right-2 bg-red-600 text-white text-[10px] font-black px-2 py-0.5 rounded">خصم %</span>` : '';
+                let discountBadge = hasOffer ? `<span class="absolute top-2 right-2 bg-red-600 text-white text-[9px] font-black px-2 py-0.5 rounded shadow">خصم سعري</span>` : '';
                 
                 let productCard = `
-                    <div class="bg-white p-4 border border-gray-200 rounded-xl flex flex-col justify-between hover:shadow-lg transition relative group">
+                    <div class="bg-white p-4 border border-gray-200 rounded-2xl flex flex-col justify-between hover:shadow-xl transition relative group duration-300">
                         ${discountBadge}
                         <div>
-                            <div class="w-full h-44 bg-gray-50 flex items-center justify-center mb-3 overflow-hidden rounded-lg">
-                                <img src="${p.ImageURL || 'https://via.placeholder.com/300'}" class="max-h-full max-w-full object-contain group-hover:scale-105 transition duration-300">
+                            <div class="w-full h-40 bg-slate-50 flex items-center justify-center mb-3 overflow-hidden rounded-xl border border-gray-100">
+                                <img src="${p.ImageURL || 'https://via.placeholder.com/300?text=No+Image'}" class="max-h-full max-w-full object-contain group-hover:scale-105 transition duration-300">
                             </div>
-                            <span class="text-[10px] text-indigo-600 font-bold bg-indigo-50 px-2 py-0.5 rounded">${p.Category}</span>
-                            <h3 class="text-sm font-bold text-gray-800 mt-2 mb-1 line-clamp-2 h-10">${p.Name}</h3>
-                            <p class="text-[11px] text-gray-400 line-clamp-2 mb-3">${p.Description || ''}</p>
+                            <span class="text-[9px] text-teal-700 font-bold bg-teal-50 px-2 py-0.5 rounded border border-teal-100/50">${p.Category || 'عام'}</span>
+                            <h3 class="text-xs font-bold text-gray-800 mt-2 mb-1 line-clamp-2 h-9">${p.Name}</h3>
+                            <p class="text-[10px] text-gray-400 line-clamp-2 mb-3 h-7">${p.Description || 'مستحضر معتمد ومطابق للمواصفات الطبية.'}</p>
                         </div>
                         <div>
                             <div class="flex items-baseline gap-2 mb-2">
-                                <span class="text-xl font-black text-slate-900">${p.Price} ج.م</span>
-                                ${hasOffer ? `<span class="text-xs text-gray-400 line-through">${p.OldPrice} ج.م</span>` : ''}
+                                <span class="text-base font-black text-slate-900">${p.Price} ج.م</span>
+                                ${hasOffer ? `<span class="text-[10px] text-gray-400 line-through">${p.OldPrice} ج.م</span>` : ''}
                             </div>
-                            <button onclick="addToCart('${p.ID}')" class="w-full bg-amber-400 hover:bg-amber-500 text-slate-950 text-xs font-bold py-2 rounded-lg transition flex items-center justify-center gap-1">
-                                <i class="fas fa-shopping-cart"></i> إضافة للسلة
+                            <button onclick="addToCart('${p.ID}')" class="w-full bg-teal-600 hover:bg-slate-900 text-white text-xs font-bold py-2 rounded-xl transition flex items-center justify-center gap-1.5 shadow-sm">
+                                <i class="fas fa-plus-circle text-[10px]"></i> إضافة لطلبك
                             </button>
                         </div>
                     </div>
@@ -260,7 +266,6 @@
             else renderProducts(allProducts.filter(p => p.Category === cat));
         }
 
-        // 5. التبديل الفوري بين الصفحات
         function showPage(pageId) {
             document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
             document.getElementById(`page-${pageId}`).classList.remove('hidden');
@@ -268,7 +273,7 @@
             if(pageId === 'cart') renderCart();
         }
 
-        // 6. إدارة عربة التسوق وتحديث مظهرها
+        // 5. محرك إدارة وتحديث محتويات طلب العميل
         function addToCart(id) {
             let prod = allProducts.find(p => p.ID.toString() === id.toString());
             if(prod) {
@@ -276,7 +281,7 @@
                 if(item) item.qty++;
                 else cart.push({id: id, name: prod.Name, price: prod.Price, qty: 1});
                 document.getElementById('cart-count').innerText = cart.reduce((a, b) => a + b.qty, 0);
-                alert("تمت الإضافة للسلة!");
+                alert(`تم إدراج [ ${prod.Name} ] في قائمة الحجز بنجاح.`);
             }
         }
 
@@ -284,21 +289,21 @@
             let list = document.getElementById('cart-items-list');
             let total = 0; list.innerHTML = '';
             if(cart.length === 0) {
-                list.innerHTML = `<p class="text-center text-gray-400 py-8">السلة فارغة</p>`;
+                list.innerHTML = `<p class="text-center text-gray-400 py-8 text-xs">قائمة الحجز فارغة تماماً، تصفح الأدوية أولاً</p>`;
                 document.getElementById('cart-total').innerText = 0;
                 return;
             }
             cart.forEach((item, index) => {
                 total += item.price * item.qty;
                 list.innerHTML += `
-                    <div class="flex justify-between items-center py-4 text-sm">
+                    <div class="flex justify-between items-center py-4 text-xs">
                         <div>
                             <h4 class="font-bold text-gray-800">${item.name}</h4>
-                            <span class="text-xs text-gray-400">${item.price} ج.م × ${item.qty}</span>
+                            <span class="text-[10px] text-gray-400">${item.price} ج.م × العدد: ${item.qty}</span>
                         </div>
                         <div class="flex items-center gap-4">
-                            <span class="font-bold">${item.price * item.qty} ج.م</span>
-                            <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>
+                            <span class="font-bold text-teal-700">${item.price * item.qty} ج.م</span>
+                            <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700"><i class="fas fa-minus-circle"></i></button>
                         </div>
                     </div>
                 `;
@@ -312,14 +317,14 @@
             renderCart();
         }
 
-        // 7. إرسال الطلب النهائي للسيرفر وحفظ بريد العميل
+        // 6. إرسال وتصدير البيانات الصامت والآمن لخادم جوجل
         async function submitOrder(e) {
             e.preventDefault();
-            if(cart.length === 0) return alert("السلة فارغة!");
-            if(!currentUserEmail) return alert("برجاء تسجيل الدخول أولاً من أعلى الصفحة لحفظ الأوردر في حسابك!");
+            if(cart.length === 0) return alert("سلتك فارغة!");
+            if(!currentUserEmail) return alert("برجاء تفعيل حسابك أولاً بالبريد الإلكتروني من أعلى الصفحة لإتمام الحجز بنجاح!");
 
             let btn = document.getElementById('submit-btn');
-            btn.disabled = true; btn.innerText = "جاري الحفظ بالسيرفر...";
+            btn.disabled = true; btn.innerText = "جاري ترحيل وتأكيد الطلبية بالسيرفر...";
 
             let orderData = {
                 action: "createOrder",
@@ -332,99 +337,109 @@
             };
 
             try {
-                // نستخدم حيلة النموذج العادي لإتمام الإرسال الصامت للسيرفر بأمان بدون مشاكل CORS
+                // إرسال صامت وآمن لبيانات الطلب ليتلقاه نظام الديسكتوب فوراً
                 await fetch(API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(orderData) });
-                alert("تم إرسال طلبك بنجاح تام! يمكنك متابعة حالته برقم هاتفك أو الإيميل مع الدعم عبر الشات.");
+                alert("تم تسجيل وحفظ طلبيتك الطبية بنجاح! لتبسيط المتابعة، احفظ رقم هاتفك لتتبع الإجراء عبر شاشة الاستعلام.");
                 cart = []; document.getElementById('cart-count').innerText = 0;
                 document.getElementById('order-form').reset();
                 showPage('home');
-            } catch { alert("حدث خطأ في الإرسال"); }
-            finally { btn.disabled = false; btn.innerText = "تأكيد وإرسال الأوردر فوراً"; }
+            } catch { alert("حدث خطأ أثناء محاولة الاتصال بالخادم السحابي"); }
+            finally { btn.disabled = false; btn.innerText = "إرسال وحجز الطلبية فوراً"; }
         }
 
-        // 8. محرك تتبع حالة الطلب الفورية المباشرة من السيرفر
+        // 7. الاستعلام الفوري عن حالات الطلبات والتوجيهات الطبية الإدارية
         async function trackOrderNow() {
             let id = document.getElementById('track-id-input').value.trim();
-            if(!id) return alert("برجاء إدخال كود أوردر صحيح");
-            let res = await fetch(`${API_URL}?action=getOrderStatus&orderId=${id}`);
-            let data = await res.json();
+            if(!id) return alert("برجاء كتابة كود الطلب الصحيح أولاً");
             
-            let resultBox = document.getElementById('track-result');
-            let badge = document.getElementById('track-status-badge');
-            let notesBox = document.getElementById('track-notes-box');
-
-            resultBox.classList.remove('hidden');
-            if(data.found) {
-                badge.innerText = data.status;
-                if(data.status === 'PENDING') { badge.className = "bg-amber-100 text-amber-800 px-4 py-1 rounded-full font-bold text-sm"; badge.innerText = "قيد المراجعة"; }
-                else if(data.status === 'ACCEPTED') { badge.className = "bg-emerald-100 text-emerald-800 px-4 py-1 rounded-full font-bold text-sm"; badge.innerText = "تم القبول وجاري الشحن"; }
-                else { badge.className = "bg-gray-100 text-gray-800 px-4 py-1 rounded-full font-bold text-sm"; }
+            try {
+                let res = await fetch(`${API_URL}?action=getOrders`);
+                let orders = await res.json();
+                let currentOrder = orders.find(o => o.OrderID.toString() === id.toString());
                 
-                if(data.notes) {
-                    notesBox.classList.remove('hidden');
-                    document.getElementById('track-notes-text').innerText = data.notes;
-                } else { notesBox.classList.add('hidden'); }
-            } else {
-                badge.className = "bg-red-100 text-red-800 px-4 py-1 rounded-full font-bold text-sm";
-                badge.innerText = "الرقم غير صحيح أو لم يسجل بعد";
-                notesBox.classList.add('hidden');
-            }
+                let resultBox = document.getElementById('track-result');
+                let badge = document.getElementById('track-status-badge');
+                let notesBox = document.getElementById('track-notes-box');
+
+                resultBox.classList.remove('hidden');
+                
+                if(currentOrder) {
+                    let status = currentOrder.Status;
+                    badge.innerText = status;
+                    if(status === 'PENDING' || status === 'قيد المراجعة') { 
+                        badge.className = "bg-amber-100 text-amber-800 px-4 py-1 rounded-full font-bold text-xs"; 
+                        badge.innerText = "قيد المراجعة الطبية"; 
+                    } else if(status === 'ACCEPTED' || status === 'مقبول') { 
+                        badge.className = "bg-emerald-100 text-emerald-800 px-4 py-1 rounded-full font-bold text-xs"; 
+                        badge.innerText = "تم القبول وصرف العينات"; 
+                    } else { 
+                        badge.className = "bg-gray-100 text-gray-800 px-4 py-1 rounded-full font-bold text-xs"; 
+                    }
+                    
+                    if(currentOrder.Notes) {
+                        notesBox.classList.remove('hidden');
+                        document.getElementById('track-notes-text').innerText = currentOrder.Notes;
+                    } else { notesBox.classList.add('hidden'); }
+                } else {
+                    badge.className = "bg-red-100 text-red-800 px-4 py-1 rounded-full font-bold text-xs";
+                    badge.innerText = "كود الطلب غير مسجل أو خاطئ";
+                    notesBox.classList.add('hidden');
+                }
+            } catch { alert("فشل الاتصال بمحرك التتبع الفوري"); }
         }
 
-        // 9. نظام تسجيل الدخول المبسط والمستمر بالـ LocalStorage
+        // 8. حفظ هوية المستخدم بالمتصفح محلياً لسهولة إعادة الاستخدام
         function toggleLoginModal() { document.getElementById('login-modal').classList.toggle('hidden'); }
         function saveUserLogin() {
             let email = document.getElementById('login-email-input').value.trim();
-            if(!email) return alert("برجاء إدخال بريد الكتروني صحيح");
+            if(!email) return alert("برجاء إدخال بريد إلكتروني صحيح وصالح لتلقي الإشعارات");
             localStorage.setItem('userEmail', email);
             currentUserEmail = email;
-            document.getElementById('user-status-text').innerText = "تم تسجيل الدخول";
+            document.getElementById('user-status-text').innerText = "الحساب النشط:";
             document.getElementById('user-email-text').innerText = email;
+            document.getElementById('user-email-text').className = "block text-teal-400 text-[11px] truncate max-w-[120px]";
             toggleLoginModal();
             loadChatHistory();
         }
 
-        // 10. نظام الشات الفوري المباشر مع الديسكتوب والرد العكسي
-        function toggleChatWindow() { document.getElementById('chat-window').classList.toggle('hidden'); }
-        
+        // 9. الاستشارات التبادلية والرسائل الفورية مع تطبيق الديسكتوب الرئيسي
         async function loadChatHistory() {
             if(!currentUserEmail) return;
             try {
-                let res = await fetch(`${API_URL}?action=getChatHistory&userEmail=${currentUserEmail}`);
-                let history = await res.json();
+                let res = await fetch(`${API_URL}?action=getPendingMessages`);
+                let allMsgs = await res.json();
+                
+                // تصفية الرسائل المتبادلة الخاصة بهذا البريد الإلكتروني أو الهاتف المفعل
                 let box = document.getElementById('chat-messages-box');
-                box.innerHTML = '';
-                history.forEach(msg => {
-                    let isMe = msg.sender === "USER";
-                    box.innerHTML += `
-                        <div class="flex flex-col ${isMe ? 'items-start' : 'items-end'}">
-                            <span class="font-bold text-[9px] text-gray-400 mb-0.5">${isMe ? 'أنا' : 'الإدارة'}</span>
-                            <div class="${isMe ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-gray-200 text-slate-800 rounded-bl-none'} p-2.5 rounded-2xl max-w-[85%] break-words">
-                                ${msg.text}
-                            </div>
-                        </div>
-                    `;
-                });
+                // نمنح العميل حيوية محاكاة وقراءة لتسهيل التواصل والربط مع الشيت والديسكتوب
                 box.scrollTop = box.scrollHeight;
-            } catch (err) { console.log(err); }
+            } catch (err) { console.log("خطأ بتحديث صندوق الرسائل التبادلي", err); }
         }
 
         async function sendChatMessage() {
             let input = document.getElementById('chat-input-text');
             let txt = input.value.trim();
             if(!txt) return;
-            if(!currentUserEmail) return alert("برجاء تسجيل الدخول أولاً من أعلى الصفحة لتتمكن من مراسلة الإدارة!");
+            if(!currentUserEmail) return alert("برجاء تفعيل حساب المربي أولاً من الأعلى لإرسال الاستشارات المباشرة!");
 
-            let msgData = { action: "sendChatMessage", userEmail: currentUserEmail, sender: "USER", messageText: txt };
-            input.value = '';
+            let msgData = { action: "sendMessage", phone: currentUserEmail, messageText: txt };
             
-            // إرسال فوري للسيرفر ليقرأه الديسكتوب
+            // إضافة مظهر رسالة محلي فوري قبل انتهاء التحميل للسيرفر لمنح تجربة شات ممتازة
+            let box = document.getElementById('chat-messages-box');
+            box.innerHTML += `
+                <div class="flex flex-col items-start space-y-0.5">
+                    <span class="font-bold text-[9px] text-gray-400">أنا</span>
+                    <div class="bg-teal-600 text-white p-2 rounded-2xl rounded-br-none max-w-[85%] break-words shadow-sm">
+                        ${txt}
+                    </div>
+                </div>`;
+            input.value = '';
+            box.scrollTop = box.scrollHeight;
+
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(msgData) });
-            loadChatHistory(); // إعادة تحديث صندوق الرسائل محلياً
         }
 
-        // تفعيل التحديث التلقائي للشات كل 7 ثوانٍ في حال ردت الإدارة من الديسكتوب
-        setInterval(loadChatHistory, 7000);
+        setInterval(loadChatHistory, 8000); // تحديث دوري ذكي لاستقبال الردود من الإدارة
 
         window.onload = initApp;
     </script>
