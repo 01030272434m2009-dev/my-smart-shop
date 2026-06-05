@@ -15,7 +15,8 @@
 <body class="text-gray-800 antialiased">
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbwrHN3sXL9TFbf_z12rVIIwdzRtdan6XKK7PHtuJZRk5bMTYZrZorWkBmbwk79dte8G/exec"; // ضع رابط الـ Web App الخاص بجوجل سكريبت هنا
+        // ضع رابط الـ Web App الخاص بجوجل سكريبت (تأكد من عمل New Deployment بعد كل تعديل في السيرفر)
+        const API_URL = "https://script.google.com/macros/s/AKfycbwrHN3sXL9TFbf_z12rVIIwdzRtdan6XKK7PHtuJZRk5bMTYZrZorWkBmbwk79dte8G/exec"; 
     </script>
 
     <div class="bg-amber-500 text-slate-950 text-center py-1.5 text-xs font-bold px-4 flex justify-between items-center">
@@ -49,8 +50,7 @@
         </div>
 
         <div class="bg-slate-900 border-t border-slate-800 py-2 overflow-x-auto">
-            <div id="categories-bar" class="container mx-auto px-4 flex gap-4 text-xs font-bold whitespace-nowrap">
-                </div>
+            <div id="categories-bar" class="container mx-auto px-4 flex gap-4 text-xs font-bold whitespace-nowrap"></div>
         </div>
     </header>
 
@@ -67,8 +67,7 @@
             </div>
 
             <h2 class="text-xl font-black text-slate-900 mb-4 flex items-center gap-2"><i class="fas fa-bolt text-amber-500"></i> اكتشف المقترحات الحالية للاختيار</h2>
-            <div id="home-products-grid" class="amazon-grid">
-                </div>
+            <div id="home-products-grid" class="amazon-grid"></div>
         </section>
 
         <section id="page-shop" class="page-content hidden">
@@ -88,10 +87,10 @@
                     <span class="font-bold text-gray-600">الحالة الحالية للأوردر:</span>
                     <span id="track-status-badge" class="px-4 py-1 rounded-full font-bold text-sm"></span>
                 </div>
-                <p class="text-xs text-gray-500 mt-3 p-3 bg-amber-50 rounded-xl border border-amber-100 hidden" id="track-notes-box">
-                    <strong class="block text-amber-800"><i class="fas fa-comment-dots"></i> ملاحظات الإدارة:</strong>
+                <div class="text-xs text-gray-500 mt-3 p-3 bg-amber-50 rounded-xl border border-amber-100 hidden" id="track-notes-box">
+                    <strong class="block text-amber-800 mb-1"><i class="fas fa-comment-dots"></i> ملاحظات الإدارة:</strong>
                     <span id="track-notes-text"></span>
-                </p>
+                </div>
             </div>
         </section>
 
@@ -168,7 +167,6 @@
 
         // 1. تشغيل الفحص الأولي ومحاكاة الزوار الفورية الذكية
         async function initApp() {
-            // محاكاة عدد زوار متغير تمنح حيوية للموقع كأمازون
             setInterval(() => {
                 document.getElementById('user-count').innerText = Math.floor(40 + Math.random() * 25);
             }, 4000);
@@ -179,7 +177,6 @@
             }
 
             try {
-                // جلب المنتجات والإعلانات معاً
                 let [prodRes, adsRes] = await Promise.all([
                     fetch(`${API_URL}?action=getProducts`),
                     fetch(`${API_URL}?action=getAds`)
@@ -332,42 +329,64 @@
             };
 
             try {
-                // نستخدم حيلة النموذج العادي لإتمام الإرسال الصامت للسيرفر بأمان بدون مشاكل CORS
-                await fetch(API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(orderData) });
-                alert("تم إرسال طلبك بنجاح تام! يمكنك متابعة حالته برقم هاتفك أو الإيميل مع الدعم عبر الشات.");
-                cart = []; document.getElementById('cart-count').innerText = 0;
+                // إرسال صامت متوافق لضمان الحفظ المباشر
+                await fetch(API_URL, { 
+                    method: 'POST', 
+                    mode: 'no-cors', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(orderData) 
+                });
+                
+                alert("تم إرسال طلبك بنجاح تام! يمكنك متابعة حالة طلبك برقم هاتفك أو الإيميل مع الدعم عبر الشات.");
+                cart = []; 
+                document.getElementById('cart-count').innerText = 0;
                 document.getElementById('order-form').reset();
                 showPage('home');
-            } catch { alert("حدث خطأ في الإرسال"); }
-            finally { btn.disabled = false; btn.innerText = "تأكيد وإرسال الأوردر فوراً"; }
+            } catch { 
+                alert("حدث خطأ في الإرسال"); 
+            } finally { 
+                btn.disabled = false; 
+                btn.innerText = "تأكيد وإرسال الأوردر فوراً"; 
+            }
         }
 
-        // 8. محرك تتبع حالة الطلب الفورية المباشرة من السيرفر
+        // 8. محرك تتبع حالة الطلب الموحد
         async function trackOrderNow() {
             let id = document.getElementById('track-id-input').value.trim();
             if(!id) return alert("برجاء إدخال كود أوردر صحيح");
-            let res = await fetch(`${API_URL}?action=getOrderStatus&orderId=${id}`);
-            let data = await res.json();
             
-            let resultBox = document.getElementById('track-result');
-            let badge = document.getElementById('track-status-badge');
-            let notesBox = document.getElementById('track-notes-box');
-
-            resultBox.classList.remove('hidden');
-            if(data.found) {
-                badge.innerText = data.status;
-                if(data.status === 'PENDING') { badge.className = "bg-amber-100 text-amber-800 px-4 py-1 rounded-full font-bold text-sm"; badge.innerText = "قيد المراجعة"; }
-                else if(data.status === 'ACCEPTED') { badge.className = "bg-emerald-100 text-emerald-800 px-4 py-1 rounded-full font-bold text-sm"; badge.innerText = "تم القبول وجاري الشحن"; }
-                else { badge.className = "bg-gray-100 text-gray-800 px-4 py-1 rounded-full font-bold text-sm"; }
+            try {
+                let res = await fetch(`${API_URL}?action=getOrderStatus&orderId=${id}`);
+                let data = await res.json();
                 
-                if(data.notes) {
-                    notesBox.classList.remove('hidden');
-                    document.getElementById('track-notes-text').innerText = data.notes;
-                } else { notesBox.classList.add('hidden'); }
-            } else {
-                badge.className = "bg-red-100 text-red-800 px-4 py-1 rounded-full font-bold text-sm";
-                badge.innerText = "الرقم غير صحيح أو لم يسجل بعد";
-                notesBox.classList.add('hidden');
+                let resultBox = document.getElementById('track-result');
+                let badge = document.getElementById('track-status-badge');
+                let notesBox = document.getElementById('track-notes-box');
+
+                resultBox.classList.remove('hidden');
+                if(data.found) {
+                    if(data.status === 'PENDING') { 
+                        badge.className = "bg-amber-100 text-amber-800 px-4 py-1 rounded-full font-bold text-sm"; 
+                        badge.innerText = "قيد المراجعة"; 
+                    } else if(data.status === 'ACCEPTED') { 
+                        badge.className = "bg-emerald-100 text-emerald-800 px-4 py-1 rounded-full font-bold text-sm"; 
+                        badge.innerText = "تم القبول وجاري الشحن"; 
+                    } else { 
+                        badge.className = "bg-gray-100 text-gray-800 px-4 py-1 rounded-full font-bold text-sm"; 
+                        badge.innerText = data.status;
+                    }
+                    
+                    if(data.notes) {
+                        notesBox.classList.remove('hidden');
+                        document.getElementById('track-notes-text').innerText = data.notes;
+                    } else { notesBox.classList.add('hidden'); }
+                } else {
+                    badge.className = "bg-red-100 text-red-800 px-4 py-1 rounded-full font-bold text-sm";
+                    badge.innerText = "الرقم غير صحيح أو لم يسجل بعد";
+                    notesBox.classList.add('hidden');
+                }
+            } catch (err) {
+                alert("خطأ أثناء جلب بيانات التتبع من السيرفر");
             }
         }
 
@@ -384,7 +403,7 @@
             loadChatHistory();
         }
 
-        // 10. نظام الشات الفوري المباشر مع الديسكتوب والرد العكسي
+        // 10. نظام الشات الفوري المصحح ليقرأ المتغيرات المطابقة لجداول السيرفر [UserEmail, Sender, MessageText]
         function toggleChatWindow() { document.getElementById('chat-window').classList.toggle('hidden'); }
         
         async function loadChatHistory() {
@@ -394,19 +413,26 @@
                 let history = await res.json();
                 let box = document.getElementById('chat-messages-box');
                 box.innerHTML = '';
+                
+                if(history.length === 0) {
+                    box.innerHTML = `<p class="text-center text-gray-400 py-4">أهلاً بك! اكتب رسالتك وسيتلقاها الدعم الفوري على برنامج الديسكتوب مباشرة.</p>`;
+                    return;
+                }
+
                 history.forEach(msg => {
-                    let isMe = msg.sender === "USER";
+                    // السيرفر يُرجع الحقول بصيغة قريبة من العناوين (تطابق الـ JSON الراجع)
+                    let isMe = msg.Sender === "USER";
                     box.innerHTML += `
                         <div class="flex flex-col ${isMe ? 'items-start' : 'items-end'}">
                             <span class="font-bold text-[9px] text-gray-400 mb-0.5">${isMe ? 'أنا' : 'الإدارة'}</span>
                             <div class="${isMe ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-gray-200 text-slate-800 rounded-bl-none'} p-2.5 rounded-2xl max-w-[85%] break-words">
-                                ${msg.text}
+                                ${msg.MessageText}
                             </div>
                         </div>
                     `;
                 });
                 box.scrollTop = box.scrollHeight;
-            } catch (err) { console.log(err); }
+            } catch (err) { console.log("خطأ شات:", err); }
         }
 
         async function sendChatMessage() {
@@ -415,15 +441,28 @@
             if(!txt) return;
             if(!currentUserEmail) return alert("برجاء تسجيل الدخول أولاً من أعلى الصفحة لتتمكن من مراسلة الإدارة!");
 
-            let msgData = { action: "sendChatMessage", userEmail: currentUserEmail, sender: "USER", messageText: txt };
+            let msgData = { 
+                action: "sendChatMessage", 
+                userEmail: currentUserEmail, 
+                sender: "USER", 
+                messageText: txt 
+            };
             input.value = '';
             
-            // إرسال فوري للسيرفر ليقرأه الديسكتوب
-            await fetch(API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(msgData) });
-            loadChatHistory(); // إعادة تحديث صندوق الرسائل محلياً
+            try {
+                await fetch(API_URL, { 
+                    method: 'POST', 
+                    mode: 'no-cors', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(msgData) 
+                });
+                loadChatHistory();
+            } catch(e) {
+                console.log("خطأ إرسال رسالة:", e);
+            }
         }
 
-        // تفعيل التحديث التلقائي للشات كل 7 ثوانٍ في حال ردت الإدارة من الديسكتوب
+        // فحص تحديث الشات كل 7 ثوانٍ
         setInterval(loadChatHistory, 7000);
 
         window.onload = initApp;
