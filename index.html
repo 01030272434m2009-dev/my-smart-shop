@@ -7,15 +7,23 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://script.google.com/macros/s/AKfycbwrHN3sXL9TFbf_z12rVIIwdzRtdan6XKK7PHtuJZRk5bMTYZrZorWkBmbwk79dte8G/exec');
-        body { font-family: 'Cairo', sans-serif; background-color: #f3f4f6; }
-        .amazon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
+        
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            background-color: #f3f4f6; 
+        }
+        .amazon-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
+            gap: 20px; 
+        }
     </style>
 </head>
 <body class="text-gray-800 antialiased">
 
     <script>
-        // ضع رابط الـ Web App الخاص بجوجل سكريبت (تأكد من عمل New Deployment بعد كل تعديل في السيرفر)
+        // الرابط المباشر والثابت لـ Google Apps Script Web App
         const API_URL = "https://script.google.com/macros/s/AKfycbwrHN3sXL9TFbf_z12rVIIwdzRtdan6XKK7PHtuJZRk5bMTYZrZorWkBmbwk79dte8G/exec"; 
     </script>
 
@@ -47,7 +55,7 @@
                 <nav class="flex items-center space-x-reverse space-x-6 text-sm font-bold">
                     <a href="#" onclick="showPage('home')" class="hover:text-amber-400 transition"><i class="fas fa-home"></i> الرئيسية</a>
                     <a href="#" onclick="showPage('shop')" class="hover:text-amber-400 transition"><i class="fas fa-store"></i> تصفح المنتجات</a>
-                    <a href="#" onclick="showPage('track')" class="hover:text-amber-400 transition text-amber-400"><i class="fas fa-truck"></i> تتبع طلبك</a>
+                    <a href="#" onclick="showPage('track')" class="hover:text-amber-400 transition"><i class="fas fa-truck"></i> تتبع طلبك</a>
                 </nav>
 
                 <div class="flex items-center gap-4">
@@ -179,11 +187,16 @@
         let allProducts = [];
         let cart = [];
         let currentUserEmail = localStorage.getItem('userEmail') || "";
+        let chatTimer = null;
 
         // 1. تشغيل الفحص الأولي وفحص إعدادات التحكم بالسيستم المركزي بجوجل
         async function initApp() {
+            // محاكاة حية لتحديث العداد العشوائي للزوار
             setInterval(() => {
-                document.getElementById('user-count').innerText = Math.floor(40 + Math.random() * 25);
+                const countElem = document.getElementById('user-count');
+                if (countElem) {
+                    countElem.innerText = Math.floor(40 + Math.random() * 25);
+                }
             }, 4000);
 
             if(currentUserEmail) {
@@ -192,7 +205,7 @@
             }
 
             try {
-                // إضافة طلب جلب إعدادات النظام من السيرفر فوراً للفحص المباشر
+                // جلب متوازي لكافة إعدادات وخدمات النظام من السيرفر
                 let [prodRes, adsRes, settingsRes] = await Promise.all([
                     fetch(`${API_URL}?action=getProducts`),
                     fetch(`${API_URL}?action=getAds`),
@@ -213,33 +226,45 @@
                     }
                     document.getElementById('maintenance-screen').classList.remove('hidden');
                     document.getElementById('main-app-wrapper').classList.add('hidden');
-                    return; // إيقاف تحميل باقي التطبيق حماية للبيانات
+                    return; // إيقاف تحميل باقي التطبيق حماية للبيانات والمخزون
                 }
 
                 renderAds(adsData);
                 renderCategories();
                 renderProducts();
-                if(currentUserEmail) loadChatHistory();
-            } catch (err) { console.error("خطأ في الاتصال بقاعدة البيانات", err); }
+                
+                if(currentUserEmail) {
+                    loadChatHistory();
+                    // تشغيل مؤقت الفحص التلقائي للشات كل 7 ثوانٍ
+                    chatTimer = setInterval(loadChatHistory, 7000);
+                }
+            } catch (err) { 
+                console.error("خطأ في الاتصال بقاعدة البيانات", err); 
+            }
         }
 
         // 2. معالجة وعرض الإعلانات الديناميكية من السيرفر
         function renderAds(ads) {
+            if (!Array.isArray(ads)) return;
             let activeAd = ads.find(a => a.Status === "ACTIVE");
             if(activeAd) {
                 document.getElementById('ad-title').innerText = activeAd.Title;
                 document.getElementById('ad-subtitle').innerText = activeAd.Subtitle;
-                if(activeAd.ImageURL) document.getElementById('ad-bg').style.backgroundImage = `url('${activeAd.ImageURL}')`;
+                if(activeAd.ImageURL) {
+                    document.getElementById('ad-bg').style.backgroundImage = `url('${activeAd.ImageURL}')`;
+                }
             }
         }
 
         // 3. استخراج الأقسام تلقائياً وبنائها في البار العلوي
         function renderCategories() {
             let bar = document.getElementById('categories-bar');
-            let categories = [...new Set(allProducts.map(p => p.Category))];
+            if (!bar) return;
+            let categories = [...new Set(allProducts.map(p => p.Category))].filter(Boolean);
+            
             bar.innerHTML = `<span onclick="filterByCategory('ALL')" class="bg-amber-400 text-slate-950 px-3 py-1 rounded-full cursor-pointer hover:bg-amber-500">كل الأقسام</span>`;
             categories.forEach(cat => {
-                if(cat) bar.innerHTML += `<span onclick="filterByCategory('${cat}')" class="bg-slate-800 text-gray-300 px-3 py-1 rounded-full cursor-pointer hover:bg-amber-400 hover:text-slate-950 transition">${cat}</span>`;
+                bar.innerHTML += `<span onclick="filterByCategory('${cat}')" class="bg-slate-800 text-gray-300 px-3 py-1 rounded-full cursor-pointer hover:bg-amber-400 hover:text-slate-950 transition">${cat}</span>`;
             });
         }
 
@@ -247,7 +272,10 @@
         function renderProducts(targetProducts = allProducts) {
             let grid = document.getElementById('home-products-grid');
             let shopGrid = document.getElementById('shop-products-grid');
-            grid.innerHTML = ''; shopGrid.innerHTML = '';
+            if(!grid || !shopGrid) return;
+            
+            grid.innerHTML = ''; 
+            shopGrid.innerHTML = '';
 
             let activeProducts = targetProducts.filter(p => p.Status === "ACTIVE");
 
@@ -260,9 +288,9 @@
                         ${discountBadge}
                         <div>
                             <div class="w-full h-44 bg-gray-50 flex items-center justify-center mb-3 overflow-hidden rounded-lg">
-                                <img src="${p.ImageURL || 'https://via.placeholder.com/300'}" class="max-h-full max-w-full object-contain group-hover:scale-105 transition duration-300">
+                                <img src="${p.ImageURL || 'https://via.placeholder.com/300'}" class="max-h-full max-w-full object-contain group-hover:scale-105 transition duration-300" alt="${p.Name}">
                             </div>
-                            <span class="text-[10px] text-indigo-600 font-bold bg-indigo-50 px-2 py-0.5 rounded">${p.Category}</span>
+                            <span class="text-[10px] text-indigo-600 font-bold bg-indigo-50 px-2 py-0.5 rounded">${p.Category || 'عام'}</span>
                             <h3 class="text-sm font-bold text-gray-800 mt-2 mb-1 line-clamp-2 h-10">${p.Name}</h3>
                             <p class="text-[11px] text-gray-400 line-clamp-2 mb-3">${p.Description || ''}</p>
                         </div>
@@ -288,10 +316,12 @@
             else renderProducts(allProducts.filter(p => p.Category === cat));
         }
 
-        // 5. التبديل الفوري بين الصفحات
+        // 5. التبديل الفوري بين الصفحات ورفع الأداء
         function showPage(pageId) {
             document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
-            document.getElementById(`page-${pageId}`).classList.remove('hidden');
+            const activePage = document.getElementById(`page-${pageId}`);
+            if (activePage) activePage.classList.remove('hidden');
+            
             window.scrollTo({ top: 0, behavior: 'smooth' });
             if(pageId === 'cart') renderCart();
         }
@@ -303,16 +333,20 @@
                 let item = cart.find(c => c.id === id);
                 if(item) item.qty++;
                 else cart.push({id: id, name: prod.Name, price: prod.Price, qty: 1});
+                
                 document.getElementById('cart-count').innerText = cart.reduce((a, b) => a + b.qty, 0);
-                alert("تمت الإضافة للسلة!");
+                alert("تمت إضافة الصنف بنجاح للسلة!");
             }
         }
 
         function renderCart() {
             let list = document.getElementById('cart-items-list');
-            let total = 0; list.innerHTML = '';
+            if(!list) return;
+            let total = 0; 
+            list.innerHTML = '';
+            
             if(cart.length === 0) {
-                list.innerHTML = `<p class="text-center text-gray-400 py-8">السلة فارغة</p>`;
+                list.innerHTML = `<p class="text-center text-gray-400 py-8">السلة فارغة حالياً</p>`;
                 document.getElementById('cart-total').innerText = 0;
                 return;
             }
@@ -340,14 +374,15 @@
             renderCart();
         }
 
-        // 7. إرسال الطلب النهائي للسيرفر مع جلب رقم الأوردر الحقيقي وإظهاره للعميل بنجاح 100%
+        // 7. إرسال الطلب النهائي للسيرفر مع تخطي الـ CORS وتوليد كود الأوردر الحقيقي
         async function submitOrder(e) {
             e.preventDefault();
             if(cart.length === 0) return alert("السلة فارغة!");
-            if(!currentUserEmail) return alert("برجاء تسجيل الدخول أولاً من أعلى الصفحة لحفظ الأوردر في حسابك!");
+            if(!currentUserEmail) return alert("برجاء تسجيل الدخول أولاً من أعلى الصفحة لحفظ الأوردر في حسابك الشخصي!");
 
             let btn = document.getElementById('submit-btn');
-            btn.disabled = true; btn.innerText = "جاري حفظ طلبك وإصدار الكود...";
+            btn.disabled = true; 
+            btn.innerText = "جاري حفظ طلبك وإصدار الكود المركزي...";
 
             let orderData = {
                 action: "createOrder",
@@ -359,7 +394,6 @@
                 details: cart
             };
 
-            // التحويل لـ URLSearchParams لتمكين المتصفح من قراءة رد جوجل سيرفر وتخطي الـ CORS
             let formBody = new URLSearchParams();
             formBody.append("jsonData", JSON.stringify(orderData));
 
@@ -373,7 +407,7 @@
                 let result = await response.json();
                 
                 if(result.status === "success") {
-                    alert(`🎉 تم إرسال طلبك بنجاح تام!\nكود الأوردر الخاص بك هو: [ ${result.orderId} ]\nبرجاء حفظ هذا الكود لتتمكن من تتبع حالة شحنتك لاحقاً.`);
+                    alert(`🎉 تم إرسال طلبك بنجاح تام!\nكود الأوردر الخاص بك هو: [ ${result.orderId} ]\nبرجاء حفظ الكود لتتبع حالة الشحنة مع الدعم لاحقاً.`);
                     cart = []; 
                     document.getElementById('cart-count').innerText = 0;
                     document.getElementById('order-form').reset();
@@ -382,7 +416,7 @@
                     alert("لم يتمكن السيرفر من معالجة الطلب: " + result.message);
                 }
             } catch (err) { 
-                alert("حدث خطأ أثناء حفظ الأوردر بالسيرفر، برجاء المحاولة مجدداً."); 
+                alert("حدث خطأ أثناء الاتصال بالسيرفر لحفظ الأوردر، برجاء المحاولة مجدداً."); 
                 console.error(err);
             } finally { 
                 btn.disabled = false; 
@@ -390,7 +424,7 @@
             }
         }
 
-        // 8. محرك تتبع حالة الطلب الموحد
+        // 8. محرك تتبع حالة الطلب الموحد والمتزامن
         async function trackOrderNow() {
             let id = document.getElementById('track-id-input').value.trim();
             if(!id) return alert("برجاء إدخال كود أوردر صحيح");
@@ -419,32 +453,44 @@
                     if(data.notes) {
                         notesBox.classList.remove('hidden');
                         document.getElementById('track-notes-text').innerText = data.notes;
-                    } else { notesBox.classList.add('hidden'); }
+                    } else { 
+                        notesBox.classList.add('hidden'); 
+                    }
                 } else {
                     badge.className = "bg-red-100 text-red-800 px-4 py-1 rounded-full font-bold text-sm";
-                    badge.innerText = "الرقم غير صحيح أو لم يسجل بعد";
+                    badge.innerText = "الرقم غير صحيح أو لم يسجل بالسيستم بعد";
                     notesBox.classList.add('hidden');
                 }
             } catch (err) {
-                alert("خطأ أثناء جلب بيانات التتبع من السيرفر");
+                alert("خطأ أثناء جلب بيانات التتبع من السيرفر المركزي");
             }
         }
 
         // 9. نظام تسجيل الدخول المبسط والمستمر بالـ LocalStorage
-        function toggleLoginModal() { document.getElementById('login-modal').classList.toggle('hidden'); }
+        function toggleLoginModal() { 
+            document.getElementById('login-modal').classList.toggle('hidden'); 
+        }
+        
         function saveUserLogin() {
             let email = document.getElementById('login-email-input').value.trim();
-            if(!email) return alert("برجاء إدخال بريد الكتروني صحيح");
+            if(!email) return alert("برجاء إدخال بريد إلكتروني صحيح");
+            
             localStorage.setItem('userEmail', email);
             currentUserEmail = email;
             document.getElementById('user-status-text').innerText = "تم تسجيل الدخول";
             document.getElementById('user-email-text').innerText = email;
             toggleLoginModal();
+            
+            // تهيئة شات المستخدم الجديد فورا
             loadChatHistory();
+            if (chatTimer) clearInterval(chatTimer);
+            chatTimer = setInterval(loadChatHistory, 7000);
         }
 
-        // 10. نظام الشات الفوري المصحح ليقرأ المتغيرات المطابقة لجداول السيرفر [UserEmail, Sender, MessageText]
-        function toggleChatWindow() { document.getElementById('chat-window').classList.toggle('hidden'); }
+        // 10. نظام الشات الفوري المتكامل لقراءة حقول السيرفر الموحدة [UserEmail, Sender, MessageText]
+        function toggleChatWindow() { 
+            document.getElementById('chat-window').classList.toggle('hidden'); 
+        }
         
         async function loadChatHistory() {
             if(!currentUserEmail) return;
@@ -452,9 +498,11 @@
                 let res = await fetch(`${API_URL}?action=getChatHistory&userEmail=${currentUserEmail}`);
                 let history = await res.json();
                 let box = document.getElementById('chat-messages-box');
+                if(!box) return;
+                
                 box.innerHTML = '';
                 
-                if(history.length === 0) {
+                if(!Array.isArray(history) || history.length === 0) {
                     box.innerHTML = `<p class="text-center text-gray-400 py-4">أهلاً بك! اكتب رسالتك وسيتلقاها الدعم الفوري على برنامج الديسكتوب مباشرة.</p>`;
                     return;
                 }
@@ -471,7 +519,9 @@
                     `;
                 });
                 box.scrollTop = box.scrollHeight;
-            } catch (err) { console.log("خطأ شات:", err); }
+            } catch (err) { 
+                console.log("خطأ في تحديث الشات الدوري:", err); 
+            }
         }
 
         async function sendChatMessage() {
@@ -479,6 +529,9 @@
             let txt = input.value.trim();
             if(!txt) return;
             if(!currentUserEmail) return alert("برجاء تسجيل الدخول أولاً من أعلى الصفحة لتتمكن من مراسلة الإدارة!");
+
+            // إيقاف التحديث الدوري مؤقتاً لمنع التضارب أثناء إرسال طلب الـ POST
+            if(chatTimer) clearInterval(chatTimer);
 
             let msgData = { 
                 action: "sendChatMessage", 
@@ -497,15 +550,17 @@
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }, 
                     body: formBody
                 });
-                loadChatHistory();
+                // جلب فوري بعد الإرسال لسرعة الاستجابة
+                await loadChatHistory();
             } catch(e) {
-                console.log("خطأ إرسال رسالة:", e);
+                console.log("خطأ إرسال رسالة الشات:", e);
+            } finally {
+                // إعادة تشغيل مؤقت التحديث الدوري
+                chatTimer = setInterval(loadChatHistory, 7000);
             }
         }
 
-        // فحص تحديث الشات كل 7 ثوانٍ
-        setInterval(loadChatHistory, 7000);
-
+        // تشغيل التهيئة عند اكتمال تحميل نافذة المتصفح
         window.onload = initApp;
     </script>
 </body>
