@@ -190,6 +190,7 @@
         let chatTimer = null;
 
         // 1. تشغيل الفحص الأولي وفحص إعدادات التحكم بالسيستم المركزي بجوجل
+     // 1. تشغيل الفحص الأولي وفحص إعدادات التحكم بالسيستم المركزي بجوجل
         async function initApp() {
             // محاكاة حية لتحديث العداد العشوائي للزوار
             setInterval(() => {
@@ -205,11 +206,11 @@
             }
 
             try {
-                // جلب متوازي لكافة إعدادات وخدمات النظام من السيرفر
+                // جلب متوازي لكافة إعدادات وخدمات النظام من السيرفر مع عزل الرابط تماماً بصيغة صحيحة
                 let [prodRes, adsRes, settingsRes] = await Promise.all([
-                    fetch(`${API_URL}?action=getProducts`),
-                    fetch(`${API_URL}?action=getAds`),
-                    fetch(`${API_URL}?action=getSystemSettings`)
+                    fetch(String(API_URL) + "?action=getProducts"),
+                    fetch(String(API_URL) + "?action=getAds"),
+                    fetch(String(API_URL) + "?action=getSystemSettings")
                 ]);
                 
                 allProducts = await prodRes.json();
@@ -242,7 +243,6 @@
                 console.error("خطأ في الاتصال بقاعدة البيانات", err); 
             }
         }
-
         // 2. معالجة وعرض الإعلانات الديناميكية من السيرفر
         function renderAds(ads) {
             if (!Array.isArray(ads)) return;
