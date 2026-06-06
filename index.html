@@ -375,7 +375,7 @@
         }
 
         // 7. إرسال الطلب النهائي للسيرفر مع تخطي الـ CORS وتوليد كود الأوردر الحقيقي
-        async function submitOrder(e) {
+     async function submitOrder(e) {
             e.preventDefault();
             if(cart.length === 0) return alert("السلة فارغة!");
             if(!currentUserEmail) return alert("برجاء تسجيل الدخول أولاً من أعلى الصفحة لحفظ الأوردر في حسابك الشخصي!");
@@ -394,14 +394,12 @@
                 details: cart
             };
 
-            let formBody = new URLSearchParams();
-            formBody.append("jsonData", JSON.stringify(orderData));
-
             try {
+                // إرسال البيانات كـ JSON صريح لتفادي خطأ الـ SyntaxError في السيرفر
                 let response = await fetch(API_URL, { 
                     method: 'POST', 
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }, 
-                    body: formBody
+                    headers: { 'Content-Type': 'text/plain;charset=UTF-8' }, 
+                    body: JSON.stringify(orderData)
                 });
                 
                 let result = await response.json();
@@ -530,7 +528,6 @@
             if(!txt) return;
             if(!currentUserEmail) return alert("برجاء تسجيل الدخول أولاً من أعلى الصفحة لتتمكن من مراسلة الإدارة!");
 
-            // إيقاف التحديث الدوري مؤقتاً لمنع التضارب أثناء إرسال طلب الـ POST
             if(chatTimer) clearInterval(chatTimer);
 
             let msgData = { 
@@ -540,22 +537,18 @@
                 messageText: txt 
             };
             input.value = '';
-            
-            let formBody = new URLSearchParams();
-            formBody.append("jsonData", JSON.stringify(msgData));
 
             try {
+                // إرسال كـ JSON مباشر لمنع تكرار الخطأ
                 await fetch(API_URL, { 
                     method: 'POST', 
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }, 
-                    body: formBody
+                    headers: { 'Content-Type': 'text/plain;charset=UTF-8' }, 
+                    body: JSON.stringify(msgData)
                 });
-                // جلب فوري بعد الإرسال لسرعة الاستجابة
                 await loadChatHistory();
             } catch(e) {
                 console.log("خطأ إرسال رسالة الشات:", e);
             } finally {
-                // إعادة تشغيل مؤقت التحديث الدوري
                 chatTimer = setInterval(loadChatHistory, 7000);
             }
         }
