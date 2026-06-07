@@ -533,25 +533,47 @@
         function toggleLoginModal() { 
             document.getElementById('login-modal').classList.toggle('hidden'); 
         }
-
-        function requestVerificationCode() {
-            let email = document.getElementById('login-email-input').value.trim();
+async function requestVerificationCode() {
+            let emailInput = document.getElementById('login-email-input');
+            let email = emailInput.value.trim();
             if(!email || !email.includes('@')) return showToast("برجاء إدخال بريد إلكتروني حقيقي وصحيح", "error");
 
-            document.getElementById('btn-send-otp').disabled = true;
-            document.getElementById('btn-send-otp').innerText = "جاري الاتصال وتوليد الكود...";
+            let btn = document.getElementById('btn-send-otp');
+            btn.disabled = true;
+            btn.innerText = "جاري الاتصال وإرسال الكود لإيميلك...";
 
-            // توليد كود عشوائي حقيقي مكون من 6 أرقام كمحاكاة آمنة
-            generatedOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
-            console.log("=== كود التحقق الحقيقي النشط بالسيرفر هو: " + generatedOtpCode + " ===");
-
-            setTimeout(() => {
-                document.getElementById('otp-step-1').classList.add('hidden');
-                document.getElementById('otp-step-2').classList.remove('hidden');
-                document.getElementById('btn-send-otp').disabled = false;
-                document.getElementById('btn-send-otp').innerText = "إرسال كود التحقق النشط";
-                showToast("تم إصدار وتوليد الرمز الموحد بنجاح!", "success");
-            }, 1500);
+            try {
+                // الاتصال المباشر بالسيرفر لإرسال الإيميل الحقيقي
+                let res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+                    body: JSON.stringify({
+                        action: "sendOTP",
+                        userEmail: email
+                    })
+                });
+                
+                let data = await res.json();
+                
+                if(data.status === "success") {
+                    // تخزين الكود القادم من السيرفر في المتغير لمطابقته عند التأكيد
+                    generatedOtpCode = data.otp; 
+                    
+                    showToast("تم إرسال كود التحقق إلى بريدك الإلكتروني بنجاح!", "success");
+                    
+                    // نقل المستخدم لخطوة إدخال الكود
+                    document.getElementById('otp-step-1').classList.add('hidden');
+                    document.getElementById('otp-step-2').classList.remove('hidden');
+                } else {
+                    showToast("خطأ من السيرفر: " + data.message, "error");
+                }
+            } catch(err) {
+                console.error("خطأ أثناء طلب كود التحقق من السيرفر:", err);
+                showToast("فشل الاتصال بالسيرفر لإرسال كود التحقق.", "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "إرسال كود التحقق النشط";
+            }
         }
 
         function verifyAndLogin() {
