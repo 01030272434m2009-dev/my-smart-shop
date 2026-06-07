@@ -39,6 +39,45 @@
             background: #f59e0b;
             border-radius: 10px;
         }
+        /* الحاوية العامة لكل سطر رسالة */
+.message-row {
+    display: flex;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+/* 1. تنسيق الرسائل المرسلة من العميل (تظهر جهة اليمين بلون مميز) */
+.message-row.sent {
+    justify-content: flex-start;
+}
+.message-row.sent .message-text {
+    background-color: #e0e7ff; /* لون أزرق/بنفسجي فاتح مريح */
+    color: #1e1b4b;
+    border-radius: 16px 16px 0px 16px;
+    box-shadow: 0 2px 4px rgba(79, 70, 229, 0.05);
+}
+
+/* 2. تنسيق الرسائل المستقبلة من الإدارة/الديسكتوب (تظهر جهة اليسار باللون الأبيض) */
+.message-row.received {
+    justify-content: flex-end;
+}
+.message-row.received .message-text {
+    background-color: #ffffff;
+    color: #0f172a;
+    border-radius: 16px 16px 16px 0px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.06);
+    border: 1px solid #f1f5f9;
+}
+
+/* التنسيق الداخلي لفقاعة نص الرسالة */
+.message-text {
+    max-width: 80%;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.6;
+    word-wrap: break-word;
+}
     </style>
 </head>
 <body class="text-gray-800 antialiased bg-slate-50">
@@ -644,7 +683,7 @@
             box.scrollTop = box.scrollHeight;
         }
         
-        async function loadChatHistory() {
+     async function loadChatHistory() {
             if(!currentUserEmail) return;
             try {
                 let res = await fetch(`${API_URL}?action=getChatHistory&userEmail=${currentUserEmail}`);
@@ -653,29 +692,34 @@
                 if(!box) return;
                 
                 box.innerHTML = '';
-                
                 if(!Array.isArray(history) || history.length === 0) {
-                    box.innerHTML = `<p class="text-center text-gray-400 py-6 font-medium leading-relaxed bg-white border border-gray-100 rounded-2xl p-4 shadow-sm mx-2">مرحباً بك! لا توجد مراسلات سابقة، اكتب رسالتك لتصل إلى لوحة تحكم الديسكتوب فوراً.</p>`;
+                    box.innerHTML = `<p class="text-center text-gray-400 py-6 font-medium leading-relaxed bg-white border border-gray-100 rounded-2xl p-4 shadow-sm mx-2">مرحباً بك!<br>لا توجد مراسلات سابقة، اكتب رسالتك لتصل إلى لوحة تحكم الديسكتوب فوراً.</p>`;
                     return;
                 }
 
+                // --- بداية التعديل المطلوب لتقسيم وتلوين الرسائل بشكل احترافي ---
                 history.forEach(msg => {
-                    let isMe = msg.Sender === "USER";
+                    let isMe = msg.Sender === "USER" || msg.sender === "USER";
+                    
+                    // إنشاء السطر وتحديد نوعه (مرسل أم مستلم) بناء على الـ CSS الجديد
                     box.innerHTML += `
-                        <div class="flex flex-col ${isMe ? 'items-start' : 'items-end'} animate-fade-in">
-                            <span class="font-black text-[10px] text-gray-400 mb-1 px-1">${isMe ? 'أنا (مستعمل)' : 'الإدارة البيطرية'}</span>
-                            <div class="${isMe ? 'bg-indigo-600 text-white rounded-br-none shadow-md shadow-indigo-600/10' : 'bg-white text-slate-800 rounded-bl-none shadow-sm border border-gray-100'} p-3 rounded-2xl max-w-[85%] break-words font-bold text-xs leading-relaxed">
-                                ${msg.MessageText}
+                        <div class="message-row ${isMe ? 'sent' : 'received'} animate-fade-in flex flex-col">
+                            <span class="font-black text-[9px] text-gray-400 mb-1 px-2 ${isMe ? 'text-right' : 'text-left'}">
+                                ${isMe ? 'أنا (مستعمل)' : 'الإدارة البيطرية'}
+                            </span>
+                            <div class="message-text">
+                                ${msg.MessageText || msg.messageText || ""}
                             </div>
                         </div>
                     `;
                 });
+                // --- نهاية التعديل ---
+
                 box.scrollTop = box.scrollHeight;
             } catch (err) { 
-                console.log("خطأ في تحديث الشات الدوري:", err); 
+                console.log("خطأ في تحديث الشات الدوري:", err);
             }
         }
-
         async function sendChatMessage() {
             let input = document.getElementById('chat-input-text');
             let txt = input.value.trim();
