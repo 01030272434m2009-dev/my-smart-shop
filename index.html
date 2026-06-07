@@ -741,8 +741,7 @@ async function requestVerificationCode() {
                 console.log("خطأ في تحديث الشات الدوري:", err);
             } // 👈 إغلاق الـ try والـ catch
         } // 👈 إغلاق دالة loadChatHistory بالكامل
-
-        async function sendChatMessage() {
+async function sendChatMessage() {
             let input = document.getElementById('chat-input-text');
             let txt = input.value.trim();
             if(!txt) return;
@@ -750,10 +749,11 @@ async function requestVerificationCode() {
 
             if(chatTimer) clearInterval(chatTimer);
 
+            // التعديل هنا: تحويل sender إلى Sender ليطابق عمود السيرفر بالظبط
             let msgData = { 
                 action: "sendChatMessage", 
                 userEmail: currentUserEmail, 
-                sender: "USER", 
+                Sender: "USER", // 👈 تم التعديل بحرف S كبير
                 messageText: txt 
             };
             input.value = '';
