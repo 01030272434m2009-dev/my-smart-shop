@@ -683,7 +683,7 @@
             box.scrollTop = box.scrollHeight;
         }
         
-     async function loadChatHistory() {
+ async function loadChatHistory() {
             if(!currentUserEmail) return;
             try {
                 let res = await fetch(`${API_URL}?action=getChatHistory&userEmail=${currentUserEmail}`);
@@ -697,29 +697,29 @@
                     return;
                 }
 
-                // --- بداية التعديل المطلوب لتقسيم وتلوين الرسائل بشكل احترافي ---
+                // --- عرض وتلوين الرسائل بشكل احترافي مع الأقواس السليمة ---
                 history.forEach(msg => {
-                    let isMe = msg.Sender === "USER" || msg.sender === "USER";
+                    let isMe = msg.Sender === "USER" || msg.sender === "USER" || msg.Sender === "user" || msg.sender === "user";
                     
-                    // إنشاء السطر وتحديد نوعه (مرسل أم مستلم) بناء على الـ CSS الجديد
                     box.innerHTML += `
-                        <div class="message-row ${isMe ? 'sent' : 'received'} animate-fade-in flex flex-col">
-                            <span class="font-black text-[9px] text-gray-400 mb-1 px-2 ${isMe ? 'text-right' : 'text-left'}">
+                        <div class="flex flex-col mb-4 ${isMe ? 'items-start' : 'items-end'} animate-fade-in">
+                            <span class="font-black text-[10px] text-gray-400 mb-1 px-2">
                                 ${isMe ? 'أنا (مستعمل)' : 'الإدارة البيطرية'}
                             </span>
-                            <div class="message-text">
+                            <div class="max-w-[80%] p-3 rounded-2xl text-sm font-semibold leading-relaxed shadow-sm border
+                                ${isMe ? 'bg-indigo-50 text-indigo-950 border-indigo-100 rounded-bl-none' : 'bg-white text-slate-800 border-slate-100 rounded-br-none'}">
                                 ${msg.MessageText || msg.messageText || ""}
                             </div>
                         </div>
                     `;
-                });
-                // --- نهاية التعديل ---
+                }); // 👈 إغلاق الـ forEach السليم
 
-                box.scrollTop = box.scrollHeight;
+                box.scrollTop = box.scrollHeight; // 👈 سطر نزول السكرول لآخر رسالة تلقائياً
             } catch (err) { 
                 console.log("خطأ في تحديث الشات الدوري:", err);
-            }
-        }
+            } // 👈 إغلاق الـ try والـ catch
+        } // 👈 إغلاق دالة loadChatHistory بالكامل
+
         async function sendChatMessage() {
             let input = document.getElementById('chat-input-text');
             let txt = input.value.trim();
