@@ -698,41 +698,41 @@ async function requestVerificationCode() {
             }
         }
 
-      // 11. غرف ونظام الشات المطور المتكامل (تحديث العرض التلقائي عند الفتح)
-        function toggleChatWindow() { 
-            const chatWindow = document.getElementById('chat-window');
-            if (!chatWindow) return;
+    // =========================================================
+// 11. غرف ونظام الشات المطور المتكامل (النسخة الموحدة والنهائية بدون تضارب)
+// =========================================================
 
-            // تبديل حالة الظهور (إظهار / إخفاء)
-            chatWindow.classList.toggle('hidden'); 
+function toggleChatWindow() { 
+    const chatWindow = document.getElementById('chat-window');
+    if (!chatWindow) return;
 
-            // إذا أصبحت نافذة الشات مفتوحة وظاهرة للعميل
-            if (!chatWindow.classList.contains('hidden')) {
-                
-                // 1. تحميل وجلب أرشيف الرسائل من السيرفر فوراً ليعرض على الشاشة
-                loadChatHistory(); 
+    // تبديل حالة الظهور (إظهار / إخفاء)
+    chatWindow.classList.toggle('hidden'); 
 
-                // 2. ضبط النزول التلقائي للسكرول لآخر رسالة بالأسفل
-                let box = document.getElementById('chat-messages-box');
-                if (box) {
-                    box.scrollTop = box.scrollHeight;
-                }
+    // إذا أصبحت نافذة الشات مفتوحة وظاهرة للعميل
+    if (!chatWindow.classList.contains('hidden')) {
+        
+        // 1. تحميل وجلب أرشيف الرسائل من السيرفر فوراً ليعرض على الشاشة
+        loadChatHistory(); 
 
-                // 3. تشغيل التحديث الدوري كل 5 ثوانٍ لجلب ردود الإدارة تلقائياً
-                if (window.chatTimer) clearInterval(window.chatTimer);
-                window.chatTimer = setInterval(loadChatHistory, 5000);
-
-            } else {
-                // إذا قام العميل بقفل نافذة الشات، يتم إيقاف المؤقت فوراً لتوفير موارد المتصفح
-                if (window.chatTimer) {
-                    clearInterval(window.chatTimer);
-                }
-            }
+        // 2. ضبط النزول التلقائي للسكرول لآخر رسالة بالأسفل
+        let box = document.getElementById('chat-messages-box');
+        if (box) {
+            box.scrollTop = box.scrollHeight;
         }
-// =========================================================
-// 1. دالة تحميل وعرض رسائل الشات (مطابقة تماماً للسيرفر والشيت)
-// =========================================================
-// دالة تحميل وعرض رسائل الشات (محدثة ومؤمنة بالكامل للعرض الفوري)
+
+        // 3. تشغيل التحديث الدوري كل 5 ثوانٍ لجلب ردود الإدارة تلقائياً
+        if (window.chatTimer) clearInterval(window.chatTimer);
+        window.chatTimer = setInterval(loadChatHistory, 5000);
+
+    } else {
+        // إذا قام العميل بقفل نافذة الشات، يتم إيقاف المؤقت فوراً لتوفير موارد المتصفح
+        if (window.chatTimer) {
+            clearInterval(window.chatTimer);
+        }
+    }
+}
+
 async function loadChatHistory() {
     if (!currentUserEmail) return;
     try {
@@ -740,8 +740,8 @@ async function loadChatHistory() {
         let res = await fetch(`${API_URL}?action=getChatHistory&userEmail=${encodeURIComponent(currentUserEmail)}`);
         let messages = await res.json();
 
-        // الوصول إلى حاوية الشات الصحيحة في تصميمك
-        let container = document.getElementById('chat-box-messages');
+        // 👈 تم التعديل هنا: الوصول إلى الحاوية الصحيحة الموجودة في تصميمك (chat-messages-box)
+        let container = document.getElementById('chat-messages-box');
         if (!container) return;
         
         container.innerHTML = ''; // تفريغ الصندوق تماماً قبل إعادة بناء المحادثة
@@ -749,7 +749,7 @@ async function loadChatHistory() {
         // التأكد من أن السيرفر أعاد مصفوفة رسائل صالحة
         if (Array.isArray(messages) && messages.length > 0) {
             messages.forEach(msg => {
-                // مواءمة ذكية: تقرأ الحروف الكبيرة من السيرفر (والصغيرة كاحتياط)
+                // مواءمة ذكية: تقرأ الحروف الكبيرة من السيرفر
                 let text = msg.MessageText || msg.messageText || "";
                 let sender = msg.Sender || msg.sender || "USER";
                 let timestamp = msg.Timestamp || msg.timestamp || "";
@@ -759,7 +759,7 @@ async function loadChatHistory() {
 
                 let msgHtml = '';
                 if (isMe) {
-                    // تصميم رسالة العميل (أنت) - تظهر بشكل احترافي
+                    // تصميم رسالة العميل (أنت)
                     msgHtml = `
                         <div class="flex justify-start mb-3">
                             <div class="bg-indigo-600 text-white p-3 rounded-xl rounded-br-none max-w-[80%] shadow-sm">
@@ -778,7 +778,7 @@ async function loadChatHistory() {
                             </div>
                         </div>`;
                 }
-                // حقن الرسالة داخل الحاوية
+                // حقن الرسالة داخل الحاوية الصحيحة
                 container.insertAdjacentHTML('beforeend', msgHtml);
             });
         } else {
@@ -793,51 +793,39 @@ async function loadChatHistory() {
         console.log("خطأ في تحديث وعرض الشات الدوري:", err);
     }
 }
-// =========================================================
-// 2. دالة فتح نافذة الشات وتشغيل التحديث الدوري
-// =========================================================
+
 function showChatWindow() {
     document.getElementById('chat-backdrop').classList.remove('hidden');
     document.getElementById('chat-sidebar').classList.remove('translate-x-full');
     
     loadChatHistory(); // تحميل الرسائل فوراً بمجرد الفتح
     
-    // تشغيل العداد الدوري لتحديث الشات تلقائياً كل 5 ثوانٍ لجلب ردود الإدارة
     if (window.chatTimer) clearInterval(window.chatTimer);
     window.chatTimer = setInterval(loadChatHistory, 5000);
 }
 
-// =========================================================
-// 3. دالة إغلاق نافذة الشات وإيقاف العداد
-// =========================================================
 function hideChatWindow() {
     document.getElementById('chat-backdrop').classList.add('hidden');
     document.getElementById('chat-sidebar').classList.add('translate-x-full');
     
-    // إيقاف العداد فوراً لمنع استهلاك الموارد بعد إغلاق الشات
     if (window.chatTimer) {
         clearInterval(window.chatTimer);
     }
 }
 
-// =========================================================
-// 4. دالة إرسال الرسالة (تم تعديل الحروف لتطابق السيرفر والشيت لمنع الـ undefined)
-// =========================================================
 async function sendChatMessage() {
     let input = document.getElementById('chat-input-text');
     let txt = input.value.trim();
     if (!txt) return;
     if (!currentUserEmail) return showToast("برجاء تسجيل الدخول أولاً لتتمكن من مراسلة الإدارة الفورية!", "error");
 
-    // إيقاف المؤقت مؤقتاً أثناء عملية الإرسال لتجنب التداخل
     if (window.chatTimer) clearInterval(window.chatTimer);
 
-    // ✨ التعديل الجوهري: تحويل مفاتيح الـ JSON لتبدأ بحروف كبيرة تطابق أعمدة الشيت والسيرفر تماماً
     let msgData = { 
         action: "sendChatMessage", 
-        UserEmail: currentUserEmail,   // 👈 حرف U كبير ليطابق الشيت والسيرفر
-        Sender: "USER",                 // 👈 حرف S كبير ليطابق الشيت والسيرفر
-        MessageText: txt                // 👈 حرف M وحرف T كبير ليطابق الشيت والسيرفر
+        UserEmail: currentUserEmail,   
+        Sender: "USER",                 
+        MessageText: txt                
     };
     input.value = ''; // تنظيف حقل الإدخال فوراً لتجربة مستخدم سريعة
 
@@ -851,11 +839,9 @@ async function sendChatMessage() {
     } catch(e) {
         console.log("خطأ إرسال رسالة الشات:", e);
     } finally {
-        // إعادة تشغيل التحديث الدوري التلقائي كل 5 ثوانٍ بنجاح
         window.chatTimer = setInterval(loadChatHistory, 5000);
     }
 }
-
         window.onload = initApp;
     </script>
 </body>
