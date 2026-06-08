@@ -350,6 +350,8 @@
                 ]);
                 
                 allProducts = await prodRes.json();
+                console.log("Products =", allProducts);
+console.log("First Product =", allProducts[0]);
                 let adsData = await adsRes.json();
                 let systemSettings = await settingsRes.json();
 
