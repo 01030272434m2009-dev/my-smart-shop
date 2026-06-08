@@ -487,7 +487,6 @@ function renderProducts(targetProducts = allProducts) {
         if (shopGrid) shopGrid.innerHTML += productCard;
     });
 }
-
 // دالة الفلترة المحسنة مع حماية تامة ضد اختلاف حالة الأحرف (Category / category)
 function filterByCategory(cat) {
     showPage('shop');
@@ -934,6 +933,7 @@ async function loadChatHistory() {
                 window.chatTimer = setInterval(loadChatHistory, 4000);
             }
         }
+        document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
