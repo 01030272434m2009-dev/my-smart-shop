@@ -730,56 +730,58 @@ async function requestVerificationCode() {
             }
         }
 
-  async function loadChatHistory() {
-    // التأكد من وجود الإيميل وتجهيزه ونزع أي مسافات زائدة منه
+async function loadChatHistory() {
     if (!currentUserEmail) {
-        console.log("❌ لا يمكن جلب الشات: إيميل المستخدم الحالي فارغ أو غير مسجل دخول!");
+        console.log("❌ لا يمكن جلب الشات: إيميل المستخدم الحالي فارغ!");
         return;
     }
     
     let cleanEmail = currentUserEmail.toString().trim();
 
     try {
-        // تشفير الإيميل لضمان عبور علامة @ والأوت بورت بأمان
         let url = `${API_URL}?action=getChatHistory&userEmail=${encodeURIComponent(cleanEmail)}`;
-        
         let res = await fetch(url);
         let messages = await res.json();
 
-        // طباعة المخرجات في الـ Console للتشخيص الفوري (اضغط F12 في المتصفح لرؤيتها)
-        console.log("📬 البيانات القادمة من السيرفر للشات:", messages);
+        console.log("📬 البيانات الفعليّة الواصلة للويب:", messages);
 
         let container = document.getElementById('chat-messages-box');
         if (!container) return;
         
-        container.innerHTML = ''; // تفريغ الصندوق تماماً لمنع التكرار
+        container.innerHTML = ''; 
 
         if (Array.isArray(messages) && messages.length > 0) {
             messages.forEach(msg => {
-                // 🔍 [التعديل الذهبي]: قراءة نص الرسالة الفعلي من حقل Status بناءً على صورة الشيت
-                let text = msg.Status || "";
+                // 1. استخراج نص الرسالة بذكاء (العميل يكتب في Status، والديسكتوب قد يكتب في MessageText أو Status)
+                let text = msg.Status || msg.status || "";
                 
-                // حماية احتياطية: لو حقل الستيتس فارغ أو تائه، جرب قراءة الحقل البديل
+                // إذا كان النص فارغاً أو يحتوي على الكلمات المفتاحية للراسل، نقرأ الحقل الآخر فوراً
                 if (!text || text === "USER" || text === "ADMIN") {
                     text = msg.MessageText || msg.messageText || "";
                 }
 
-                // 🔍 [تحديد هوية الراسل]: عمود MessageText هو الذي يحتوي على نوع الحساب (USER أو ADMIN)
-                let senderType = msg.MessageText || msg.messageText || "";
-                let altSender = msg.Sender || msg.sender || "";
+                // 2. قراءة خانات الراسل المتوقعة من الشيت
+                let senderType = (msg.MessageText || msg.messageText || "").toString().toUpperCase().trim();
+                let altSender = (msg.Sender || msg.sender || "").toString().toUpperCase().trim();
+                let userEmailField = (msg.UserEmail || msg.userEmail || "").toString().toUpperCase().trim();
 
-                // العميل يعتبر هو صاحب الرسالة (isMe) إذا كان نوع الراسل USER
-                let isMe = (senderType.toString().toUpperCase().trim() === "USER") || 
-                           (altSender.toString().toUpperCase().trim() === "USER");
-
+                // تنظيف النص المستخرج
                 text = text.toString().trim();
-
-                // تخطي الأسطر غير المفهومة أو الفارغة تماماً
                 if (!text || text === "USER" || text === "ADMIN") return;
+
+                // 3. 👈 [القاعدة الذهبية الجديدة لهوية الراسل على الويب]:
+                // الرسالة تعتبر قادمة من الدعم الفني (المستقبلة للعميل) إذا احتوى أي حقل على كلمة ADMIN 
+                // أو إذا كانت خانة الراسل ليست USER صراحةً.
+                let isSupport = senderType === "ADMIN" || 
+                                altSender === "ADMIN" || 
+                                userEmailField === "ADMIN";
+
+                // بناءً عليه: لو مش دعم فني، يبقى العميل هو اللي باعتها (أنا - مستعمل)
+                let isMe = !isSupport;
 
                 let msgHtml = '';
                 if (isMe) {
-                    // 🔵 رسالة العميل (تظهر على اليمين/اليسار حسب تصميم الويب عندك كـ مستعمل)
+                    // 🔵 رسالة العميل نفسه (المرسلة منه)
                     msgHtml = `
                         <div class="flex flex-col mb-4 items-start animate-fade-in">
                             <span class="font-black text-[10px] text-indigo-600 mb-1 px-2">أنا (مستعمل)</span>
@@ -788,11 +790,11 @@ async function requestVerificationCode() {
                             </div>
                         </div>`;
                 } else {
-                    // 🟢 رسالة الدعم الفني القادمة من الديسكتوب التابع للإدارة بفاقوس
+                    // 🟢 رسالة الدعم الفني (المستقبلة من الإدارة بفاقوس) - التي كانت تختفي
                     msgHtml = `
                         <div class="flex flex-col mb-4 items-end animate-fade-in">
-                            <span class="font-black text-[10px] text-gray-500 mb-1 px-2">الدعم الفني</span>
-                            <div class="max-w-[80%] p-3 rounded-2xl text-sm font-semibold leading-relaxed shadow-sm border bg-white text-slate-800 border-slate-100 rounded-br-none">
+                            <span class="font-black text-[10px] text-green-600 mb-1 px-2">الدعم الفني</span>
+                            <div class="max-w-[80%] p-3 rounded-2xl text-sm font-semibold leading-relaxed shadow-sm border bg-green-50 text-slate-800 border-green-100 rounded-br-none">
                                 ${text}
                             </div>
                         </div>`;
@@ -800,15 +802,13 @@ async function requestVerificationCode() {
                 container.insertAdjacentHTML('beforeend', msgHtml);
             });
         } else {
-            // رسالة تنبيهية إذا كانت مصفوفة المحادثات فارغة
             container.innerHTML = `<p class="text-center text-gray-400 py-6 font-medium leading-relaxed bg-white border border-gray-100 rounded-2xl p-4 shadow-sm mx-2">مرحباً بك!<br>لا توجد مراسلات سابقة، اكتب رسالتك لتصل فوراً.</p>`;
         }
 
-        // نزول السكرول تلقائياً لأسفل المحادثة
         container.scrollTop = container.scrollHeight;
 
     } catch (err) {
-        console.log("❌ خطأ أثناء جلب وعرض الشات الدوري على الويب:", err);
+        console.log("❌ خطأ أثناء جلب وعرض الشات على الويب:", err);
     }
 }
         function showChatWindow() {
