@@ -730,62 +730,71 @@ async function requestVerificationCode() {
             }
         }
 
-        async function loadChatHistory() {
-            if (!currentUserEmail) return;
-            try {
-                // جلب الأرشيف مع تشفير الإيميل لضمان وصول علامة @ للسيرفر بدون تشويه
-                let res = await fetch(`${API_URL}?action=getChatHistory&userEmail=${encodeURIComponent(currentUserEmail)}`);
-                let messages = await res.json();
+     async function loadChatHistory() {
+    // التأكد من وجود الإيميل وتجهيزه ونزع أي مسافات زائدة منه
+    if (!currentUserEmail) {
+        console.log("❌ لا يمكن جلب الشات: إيميل المستخدم الحالي فارغ أو غير مسجل دخول!");
+        return;
+    }
+    
+    let cleanEmail = currentUserEmail.toString().trim();
 
-                let container = document.getElementById('chat-messages-box');
-                if (!container) return;
-                
-                container.innerHTML = ''; // تفريغ الشات قبل بناء الرسائل الجديدة لمنع التكرار
+    try {
+        // تشفير الإيميل لضمان عبور علامة @ والأوت بورت بأمان
+        let url = `${API_URL}?action=getChatHistory&userEmail=${encodeURIComponent(cleanEmail)}`;
+        
+        let res = await fetch(url);
+        let messages = await res.json();
 
-                if (Array.isArray(messages) && messages.length > 0) {
-                    messages.forEach(msg => {
-                        // ✨ التعديل الجوهري: مطابقة حروف السيرفر وجوجل شيت الكبيرة (Capital) بنسبة 100%
-                        let text = msg.MessageText || "";
-                        let sender = msg.Sender || "USER";
-                        let timestamp = msg.Timestamp || "";
+        // طباعة المخرجات في الـ Console للتشخيص الفوري (اضغط F12 في المتصفح لرؤيتها)
+        console.log("📬 البيانات القادمة من السيرفر للشات:", messages);
 
-                        // التحقق من هوية الراسل
-                        let isMe = (sender.toString().toUpperCase() === "USER");
+        let container = document.getElementById('chat-messages-box');
+        if (!container) return;
+        
+        container.innerHTML = ''; // تفريغ الصندوق تماماً لمنع التكرار
 
-                        let msgHtml = '';
-                        if (isMe) {
-                            // تصميم رسالة العميل (أنت)
-                            msgHtml = `
-                                <div class="flex flex-col mb-4 items-start animate-fade-in">
-                                    <span class="font-black text-[10px] text-indigo-600 mb-1 px-2">أنا (مستعمل)</span>
-                                    <div class="max-w-[80%] p-3 rounded-2xl text-sm font-semibold leading-relaxed shadow-sm border bg-indigo-50 text-indigo-950 border-indigo-100 rounded-bl-none">
-                                        ${text}
-                                    </div>
-                                </div>`;
-                        } else {
-                            // تصميم رسالة الإدارة / الدعم الفني
-                            msgHtml = `
-                                <div class="flex flex-col mb-4 items-end animate-fade-in">
-                                    <span class="font-black text-[10px] text-gray-500 mb-1 px-2">الدعم الفني</span>
-                                    <div class="max-w-[80%] p-3 rounded-2xl text-sm font-semibold leading-relaxed shadow-sm border bg-white text-slate-800 border-slate-100 rounded-br-none">
-                                        ${text}
-                                    </div>
-                                </div>`;
-                        }
-                        container.insertAdjacentHTML('beforeend', msgHtml);
-                    });
+        if (Array.isArray(messages) && messages.length > 0) {
+            messages.forEach(msg => {
+                // قراءة مرنة ومزدوجة لكل الحالات المتوقعة من السيرفر (كبيرة أو صغيرة)
+                let text = msg.MessageText || msg.messageText || "";
+                let sender = msg.Sender || msg.sender || "USER";
+
+                // التحقق من هوية الراسل (USER أو الإدارة)
+                let isMe = (sender.toString().toUpperCase().trim() === "USER");
+
+                let msgHtml = '';
+                if (isMe) {
+                    msgHtml = `
+                        <div class="flex flex-col mb-4 items-start animate-fade-in">
+                            <span class="font-black text-[10px] text-indigo-600 mb-1 px-2">أنا (مستعمل)</span>
+                            <div class="max-w-[80%] p-3 rounded-2xl text-sm font-semibold leading-relaxed shadow-sm border bg-indigo-50 text-indigo-950 border-indigo-100 rounded-bl-none">
+                                ${text}
+                            </div>
+                        </div>`;
                 } else {
-                    // إذا كان الشات فارغاً تماماً
-                    container.innerHTML = `<p class="text-center text-gray-400 py-6 font-medium leading-relaxed bg-white border border-gray-100 rounded-2xl p-4 shadow-sm mx-2">مرحباً بك!<br>لا توجد مراسلات سابقة، اكتب رسالتك لتصل فوراً.</p>`;
+                    msgHtml = `
+                        <div class="flex flex-col mb-4 items-end animate-fade-in">
+                            <span class="font-black text-[10px] text-gray-500 mb-1 px-2">الدعم الفني</span>
+                            <div class="max-w-[80%] p-3 rounded-2xl text-sm font-semibold leading-relaxed shadow-sm border bg-white text-slate-800 border-slate-100 rounded-br-none">
+                                ${text}
+                            </div>
+                        </div>`;
                 }
-
-                // سحب السكرول لآخر رسالة تلقائياً ليراها المستخدم فوراً
-                container.scrollTop = container.scrollHeight;
-
-            } catch (err) {
-                console.log("خطأ في تحديث وعرض الشات الدوري:", err);
-            }
+                container.insertAdjacentHTML('beforeend', msgHtml);
+            });
+        } else {
+            // رسالة تنبيهية إذا كانت المصفوفة فارغة
+            container.innerHTML = `<p class="text-center text-gray-400 py-6 font-medium leading-relaxed bg-white border border-gray-100 rounded-2xl p-4 shadow-sm mx-2">مرحباً بك!<br>لا توجد مراسلات سابقة، اكتب رسالتك لتصل فوراً.</p>`;
         }
+
+        // نزول السكرول تلقائياً لأسفل المحادثة
+        container.scrollTop = container.scrollHeight;
+
+    } catch (err) {
+        console.log("❌ خطأ أثناء جلب وعرض الشات الدوري:", err);
+    }
+}
 
         function showChatWindow() {
             document.getElementById('chat-backdrop').classList.remove('hidden');
