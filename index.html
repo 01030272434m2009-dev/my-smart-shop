@@ -705,42 +705,81 @@ async function requestVerificationCode() {
             box.scrollTop = box.scrollHeight;
         }
         
- async function loadChatHistory() {
-            if(!currentUserEmail) return;
-            try {
-                let res = await fetch(`${API_URL}?action=getChatHistory&userEmail=${currentUserEmail}`);
-                let history = await res.json();
-                let box = document.getElementById('chat-messages-box');
-                if(!box) return;
-                
-                box.innerHTML = '';
-                if(!Array.isArray(history) || history.length === 0) {
-                    box.innerHTML = `<p class="text-center text-gray-400 py-6 font-medium leading-relaxed bg-white border border-gray-100 rounded-2xl p-4 shadow-sm mx-2">مرحباً بك!<br>لا توجد مراسلات سابقة، اكتب رسالتك لتصل إلى لوحة تحكم الديسكتوب فوراً.</p>`;
-                    return;
-                }
+// 1. دالة تحميل وعرض رسائل الشات (محدثة لتقرأ من السيرفر بنجاح)
+async function loadChatHistory() {
+    if (!currentUserEmail) return;
+    try {
+        let res = await fetch(`${API_URL}?action=getChatHistory&userEmail=${encodeURIComponent(currentUserEmail)}`);
+        let messages = await res.json();
 
-                // --- عرض وتلوين الرسائل بشكل احترافي مع الأقواس السليمة ---
-                history.forEach(msg => {
-                    let isMe = msg.Sender === "USER" || msg.sender === "USER" || msg.Sender === "user" || msg.sender === "user";
-                    
-                    box.innerHTML += `
-                        <div class="flex flex-col mb-4 ${isMe ? 'items-start' : 'items-end'} animate-fade-in">
-                            <span class="font-black text-[10px] text-gray-400 mb-1 px-2">
-                                ${isMe ? 'أنا (مستعمل)' : 'الإدارة البيطرية'}
-                            </span>
-                            <div class="max-w-[80%] p-3 rounded-2xl text-sm font-semibold leading-relaxed shadow-sm border
-                                ${isMe ? 'bg-indigo-50 text-indigo-950 border-indigo-100 rounded-bl-none' : 'bg-white text-slate-800 border-slate-100 rounded-br-none'}">
-                                ${msg.MessageText || msg.messageText || ""}
-                            </div>
+        // اسم الحاوية الصحيح في ملفك هو chat-box-messages
+        let container = document.getElementById('chat-box-messages');
+        if (!container) return;
+        
+        container.innerHTML = ''; // تفريغ الصندوق قبل الشحن الجديد
+
+        messages.forEach(msg => {
+            // حل مشكلة الحروف الكبيرة والصغيرة القادمة من جوجل شيت
+            let text = msg.MessageText || msg.messageText || "";
+            let sender = msg.Sender || msg.sender || "USER";
+            let timestamp = msg.Timestamp || msg.timestamp || "";
+
+            let isMe = (sender.toString().toUpperCase() === "USER");
+
+            let msgHtml = '';
+            if (isMe) {
+                // رسالة العميل (أنت)
+                msgHtml = `
+                    <div class="flex justify-start mb-3">
+                        <div class="bg-indigo-600 text-white p-3 rounded-xl rounded-br-none max-w-[80%] shadow-sm">
+                            <p class="text-sm leading-relaxed">${text}</p>
+                            <span class="block text-[10px] text-indigo-200 mt-1 text-left">${timestamp}</span>
                         </div>
-                    `;
-                }); // 👈 إغلاق الـ forEach السليم
+                    </div>`;
+            } else {
+                // رسالة الإدارة / الدعم الفني
+                msgHtml = `
+                    <div class="flex justify-end mb-3">
+                        <div class="bg-gray-100 border border-gray-200 text-gray-800 p-3 rounded-xl rounded-bl-none max-w-[80%] shadow-sm">
+                            <span class="block text-[10px] font-bold text-indigo-600 mb-1">الدعم الفني</span>
+                            <p class="text-sm leading-relaxed">${text}</p>
+                            <span class="block text-[10px] text-gray-400 mt-1 text-right">${timestamp}</span>
+                        </div>
+                    </div>`;
+            }
+            container.insertAdjacentHTML('beforeend', msgHtml);
+        });
 
-                box.scrollTop = box.scrollHeight; // 👈 سطر نزول السكرول لآخر رسالة تلقائياً
-            } catch (err) { 
-                console.log("خطأ في تحديث الشات الدوري:", err);
-            } // 👈 إغلاق الـ try والـ catch
-        } // 👈 إغلاق دالة loadChatHistory بالكامل
+        // سحب السكرول لآخر رسالة تلقائياً
+        container.scrollTop = container.scrollHeight;
+
+    } catch (err) {
+        console.log("خطأ في تحديث الشات الدوري:", err);
+    }
+}
+
+// 2. دالة فتح نافذة الشات وتشغيل التحديث الدوري (مدمجة مع كود ملفك الفعلي)
+function showChatWindow() {
+    document.getElementById('chat-backdrop').classList.remove('hidden');
+    document.getElementById('chat-sidebar').classList.remove('translate-x-full');
+    
+    loadChatHistory(); // تحميل الرسائل فوراً أول ما يفتح
+    
+    // تشغيل العداد الفوري لتحديث الشات كل 5 ثوانٍ تلقائياً بدون ريفريش للموقع
+    if (window.chatTimer) clearInterval(window.chatTimer);
+    window.chatTimer = setInterval(loadChatHistory, 5000);
+}
+
+// 3. دالة إغلاق نافذة الشات وإيقاف العداد (مدمجة مع كود ملفك الفعلي)
+function hideChatWindow() {
+    document.getElementById('chat-backdrop').classList.add('hidden');
+    document.getElementById('chat-sidebar').classList.add('translate-x-full');
+    
+    // إيقاف العداد فوراً عشان المتصفح ميبقاش بطيء والعميل قفل الشات
+    if (window.chatTimer) {
+        clearInterval(window.chatTimer);
+    }
+}
 async function sendChatMessage() {
             let input = document.getElementById('chat-input-text');
             let txt = input.value.trim();
