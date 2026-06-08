@@ -678,7 +678,7 @@ async function requestVerificationCode() {
             document.getElementById('otp-step-1').classList.remove('hidden');
         }
 
-        // 9. إرسال الطلب النهائي للسيرفر
+   // 9. إرسال الطلب النهائي للسيرفر (نسخة معدلة ومطابقة تماماً للسيرفر)
         async function submitOrder(e) {
             e.preventDefault();
             if(cart.length === 0) return showToast("السلة فارغة حالياً!", "warning");
@@ -688,14 +688,29 @@ async function requestVerificationCode() {
             btn.disabled = true; 
             btn.innerText = "جاري الاتصال وحفظ طلبك وإصدار الكود المركزي...";
 
+            // تنظيف وضمان إرسال التكلفة الإجمالية كنقم أو نص صافي بدون نصوص زائدة
+            let totalText = document.getElementById('cart-total').innerText.replace(/[^\d.]/g, '');
+
             let orderData = {
                 action: "createOrder",
                 customerName: document.getElementById('cust-name').value,
                 phone: document.getElementById('cust-phone').value,
                 address: document.getElementById('cust-address').value,
-                totalCost: document.getElementById('cart-total').innerText,
-                customerEmail: currentUserEmail,
-                details: cart
+                totalCost: parseFloat(totalText) || 0,
+                
+                // 1. التعديل الأول: إرسال الإيميل بالاسمين المفتاحيين لضمان قراءته بالسيرفر
+                CustomerEmail: currentUserEmail,
+                userEmail: currentUserEmail,
+                customerEmail: currentUserEmail, 
+
+                // 2. التعديل الثاني: إعادة صياغة عناصر السلة لتطابق حقول السيرفر والإيميل المنسق (Name, Qty, Price)
+                details: cart.map(item => ({
+                    Name: item.title || item.name || "صنف غير معرف",
+                    Qty: parseInt(item.quantity) || 1,
+                    Price: parseFloat(item.price) || 0
+                })),
+                
+                notes: document.getElementById('cust-address').value ? "العنوان: " + document.getElementById('cust-address').value : ""
             };
 
             try {
@@ -724,7 +739,6 @@ async function requestVerificationCode() {
                 btn.innerText = "تأكيد وإرسال الأوردر فوراً"; 
             }
         }
-
         // 10. محرك تتبع حالة الطلب الموحد والمتزامن
         async function trackOrderNow() {
             let id = document.getElementById('track-id-input').value.trim();
