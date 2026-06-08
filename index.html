@@ -698,7 +698,7 @@ async function requestVerificationCode() {
             }
         }
 // =========================================================
-        // 11. غرف ونظام الشات المطور المتكامل (النسخة النهائية الفائقة والمضمونة)
+        // 11. غرف ونظام الشات المطور المتكامل (النسخة المتوافقة مع السيرفر 100%)
         // =========================================================
 
         function toggleChatWindow() { 
@@ -733,7 +733,7 @@ async function requestVerificationCode() {
         async function loadChatHistory() {
             if (!currentUserEmail) return;
             try {
-                // استخدام encodeURIComponent للتأكد من إرسال الإيميل للسيرفر بشكل مشفر وصحيح (بدون تشويه بسبب الـ @)
+                // جلب الأرشيف مع تشفير الإيميل لضمان وصول علامة @ للسيرفر بدون تشويه
                 let res = await fetch(`${API_URL}?action=getChatHistory&userEmail=${encodeURIComponent(currentUserEmail)}`);
                 let messages = await res.json();
 
@@ -744,10 +744,10 @@ async function requestVerificationCode() {
 
                 if (Array.isArray(messages) && messages.length > 0) {
                     messages.forEach(msg => {
-                        // حماية مزدوجة: يقرأ الحروف الصغيرة (الموجودة في سيرفرك حالياً) والكبيرة كاحتياط قاطع
-                        let text = msg.messageText || msg.MessageText || "";
-                        let sender = msg.sender || msg.Sender || "USER";
-                        let timestamp = msg.timestamp || msg.Timestamp || "";
+                        // ✨ التعديل الجوهري: مطابقة حروف السيرفر وجوجل شيت الكبيرة (Capital) بنسبة 100%
+                        let text = msg.MessageText || "";
+                        let sender = msg.Sender || "USER";
+                        let timestamp = msg.Timestamp || "";
 
                         // التحقق من هوية الراسل
                         let isMe = (sender.toString().toUpperCase() === "USER");
@@ -814,14 +814,11 @@ async function requestVerificationCode() {
 
             if (window.chatTimer) clearInterval(window.chatTimer);
 
-            // نرسل الحروف الصغيرة والكبيرة معاً لنحافظ على دالة الإرسال الشغالة عندك دون تعديل
+            // الإرسال بالحروف الكبيرة ليطابق شروط دالة doPost في سيرفرك تماماً
             let msgData = { 
                 action: "sendChatMessage", 
-                userEmail: currentUserEmail,
                 UserEmail: currentUserEmail,   
-                sender: "USER",
                 Sender: "USER",                 
-                messageText: txt,
                 MessageText: txt                
             };
             input.value = ''; // تنظيف حقل الإدخال فوراً لتجربة مستخدم فائقة السرعة
@@ -832,7 +829,7 @@ async function requestVerificationCode() {
                     headers: { 'Content-Type': 'text/plain;charset=UTF-8' }, 
                     body: JSON.stringify(msgData)
                 });
-                // ✨ الإصلاح المنتظر: سحب وعرض المحادثة فوراً بعد الإرسال لتشاهد رسالتك في نفس اللحظة على الشاشة!
+                // جلب وعرض المحادثة فوراً بعد الإرسال الناجح لتظهر رسالتك في الحال
                 await loadChatHistory(); 
             } catch(e) {
                 console.log("خطأ إرسال رسالة الشات:", e);
@@ -840,7 +837,7 @@ async function requestVerificationCode() {
                 // إعادة تنشيط التحديث الدوري بانتظام
                 window.chatTimer = setInterval(loadChatHistory, 4000);
             }
-        }       window.onload = initApp;
+        }
     </script>
 </body>
 </html>
