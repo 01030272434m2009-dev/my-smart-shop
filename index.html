@@ -704,26 +704,29 @@ async function requestVerificationCode() {
             let box = document.getElementById('chat-messages-box');
             box.scrollTop = box.scrollHeight;
         }
-        
-// 1. دالة تحميل وعرض رسائل الشات (محدثة لتقرأ من السيرفر بنجاح)
+// =========================================================
+// 1. دالة تحميل وعرض رسائل الشات (مطابقة تماماً للسيرفر والشيت)
+// =========================================================
 async function loadChatHistory() {
     if (!currentUserEmail) return;
     try {
+        // نرسل userEmail للسيرفر بشكل صحيح ليقوم بالفلترة
         let res = await fetch(`${API_URL}?action=getChatHistory&userEmail=${encodeURIComponent(currentUserEmail)}`);
         let messages = await res.json();
 
-        // اسم الحاوية الصحيح في ملفك هو chat-box-messages
+        // الحاوية الصحيحة في ملفك لعرض الرسائل
         let container = document.getElementById('chat-box-messages');
         if (!container) return;
         
-        container.innerHTML = ''; // تفريغ الصندوق قبل الشحن الجديد
+        container.innerHTML = ''; // تفريغ الصندوق قبل شحن الرسائل الجديدة
 
         messages.forEach(msg => {
-            // حل مشكلة الحروف الكبيرة والصغيرة القادمة من جوجل شيت
+            // المطابقة: القراءة من السيرفر بالحروف الكبيرة تماماً كما هي في أعمدة الشيت
             let text = msg.MessageText || msg.messageText || "";
             let sender = msg.Sender || msg.sender || "USER";
             let timestamp = msg.Timestamp || msg.timestamp || "";
 
+            // تحديد ما إذا كانت الرسالة مرسلة من العميل الحالي
             let isMe = (sender.toString().toUpperCase() === "USER");
 
             let msgHtml = '';
@@ -750,7 +753,7 @@ async function loadChatHistory() {
             container.insertAdjacentHTML('beforeend', msgHtml);
         });
 
-        // سحب السكرول لآخر رسالة تلقائياً
+        // نزول السكرول التلقائي لآخر رسالة
         container.scrollTop = container.scrollHeight;
 
     } catch (err) {
@@ -758,58 +761,68 @@ async function loadChatHistory() {
     }
 }
 
-// 2. دالة فتح نافذة الشات وتشغيل التحديث الدوري (مدمجة مع كود ملفك الفعلي)
+// =========================================================
+// 2. دالة فتح نافذة الشات وتشغيل التحديث الدوري
+// =========================================================
 function showChatWindow() {
     document.getElementById('chat-backdrop').classList.remove('hidden');
     document.getElementById('chat-sidebar').classList.remove('translate-x-full');
     
-    loadChatHistory(); // تحميل الرسائل فوراً أول ما يفتح
+    loadChatHistory(); // تحميل الرسائل فوراً بمجرد الفتح
     
-    // تشغيل العداد الفوري لتحديث الشات كل 5 ثوانٍ تلقائياً بدون ريفريش للموقع
+    // تشغيل العداد الدوري لتحديث الشات تلقائياً كل 5 ثوانٍ لجلب ردود الإدارة
     if (window.chatTimer) clearInterval(window.chatTimer);
     window.chatTimer = setInterval(loadChatHistory, 5000);
 }
 
-// 3. دالة إغلاق نافذة الشات وإيقاف العداد (مدمجة مع كود ملفك الفعلي)
+// =========================================================
+// 3. دالة إغلاق نافذة الشات وإيقاف العداد
+// =========================================================
 function hideChatWindow() {
     document.getElementById('chat-backdrop').classList.add('hidden');
     document.getElementById('chat-sidebar').classList.add('translate-x-full');
     
-    // إيقاف العداد فوراً عشان المتصفح ميبقاش بطيء والعميل قفل الشات
+    // إيقاف العداد فوراً لمنع استهلاك الموارد بعد إغلاق الشات
     if (window.chatTimer) {
         clearInterval(window.chatTimer);
     }
 }
+
+// =========================================================
+// 4. دالة إرسال الرسالة (تم تعديل الحروف لتطابق السيرفر والشيت لمنع الـ undefined)
+// =========================================================
 async function sendChatMessage() {
-            let input = document.getElementById('chat-input-text');
-            let txt = input.value.trim();
-            if(!txt) return;
-            if(!currentUserEmail) return showToast("برجاء تسجيل الدخول أولاً لتتمكن من مراسلة الإدارة الفورية!", "error");
+    let input = document.getElementById('chat-input-text');
+    let txt = input.value.trim();
+    if (!txt) return;
+    if (!currentUserEmail) return showToast("برجاء تسجيل الدخول أولاً لتتمكن من مراسلة الإدارة الفورية!", "error");
 
-            if(chatTimer) clearInterval(chatTimer);
+    // إيقاف المؤقت مؤقتاً أثناء عملية الإرسال لتجنب التداخل
+    if (window.chatTimer) clearInterval(window.chatTimer);
 
-            // التعديل هنا: تحويل sender إلى Sender ليطابق عمود السيرفر بالظبط
-            let msgData = { 
-                action: "sendChatMessage", 
-                userEmail: currentUserEmail, 
-                Sender: "USER", // 👈 تم التعديل بحرف S كبير
-                messageText: txt 
-            };
-            input.value = '';
+    // ✨ التعديل الجوهري: تحويل مفاتيح الـ JSON لتبدأ بحروف كبيرة تطابق أعمدة الشيت والسيرفر تماماً
+    let msgData = { 
+        action: "sendChatMessage", 
+        UserEmail: currentUserEmail,   // 👈 حرف U كبير ليطابق الشيت والسيرفر
+        Sender: "USER",                 // 👈 حرف S كبير ليطابق الشيت والسيرفر
+        MessageText: txt                // 👈 حرف M وحرف T كبير ليطابق الشيت والسيرفر
+    };
+    input.value = ''; // تنظيف حقل الإدخال فوراً لتجربة مستخدم سريعة
 
-            try {
-                await fetch(API_URL, { 
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'text/plain;charset=UTF-8' }, 
-                    body: JSON.stringify(msgData)
-                });
-                await loadChatHistory();
-            } catch(e) {
-                console.log("خطأ إرسال رسالة الشات:", e);
-            } finally {
-                chatTimer = setInterval(loadChatHistory, 7000);
-            }
-        }
+    try {
+        await fetch(API_URL, { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'text/plain;charset=UTF-8' }, 
+            body: JSON.stringify(msgData)
+        });
+        await loadChatHistory(); // إعادة تحميل الأرشيف فوراً لتظهر رسالتك الجديدة في الحال
+    } catch(e) {
+        console.log("خطأ إرسال رسالة الشات:", e);
+    } finally {
+        // إعادة تشغيل التحديث الدوري التلقائي كل 5 ثوانٍ بنجاح
+        window.chatTimer = setInterval(loadChatHistory, 5000);
+    }
+}
 
         window.onload = initApp;
     </script>
