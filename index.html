@@ -404,7 +404,7 @@
             });
         }
 
-     // 5. عرض ورص المنتجات بأسلوب الـ Premium Grid مع فحص دقيق للكميات ونفاد المخزون
+    // 5. عرض ورص المنتجات بأسلوب الـ Premium Grid مع فحص دقيق للكميات ونفاد المخزون
 function renderProducts(targetProducts = allProducts) {
     let grid = document.getElementById('home-products-grid');
     let shopGrid = document.getElementById('shop-products-grid');
@@ -420,7 +420,7 @@ function renderProducts(targetProducts = allProducts) {
     });
 
     activeProducts.forEach(p => {
-        // قراءة مرنة لبيانات الصنف لدعم الحروف الكبيرة والصغيرة
+        // قراءة مرنة لبيانات الصنف لدعم الحروف الكبيرة والصغيرة من السيرفر
         let pId = p.ID || p.id;
         let pName = p.Name || p.name || "منتج";
         let pPrice = p.Price || p.price || 0;
@@ -499,7 +499,6 @@ function filterByCategory(cat) {
         renderProducts(filtered);
     }
 }
-
         // 6. الـ Router المطور الجاهز لدمج وفتح ملفات خارجية مستقبلاً
         function showPage(pageId, optionalExternalFile = null) {
             document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
