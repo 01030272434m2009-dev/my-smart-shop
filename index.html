@@ -697,148 +697,150 @@ async function requestVerificationCode() {
                 showToast("خطأ أثناء جلب بيانات التتبع من السيرفر", "error");
             }
         }
-
-    // =========================================================
-// 11. غرف ونظام الشات المطور المتكامل (النسخة الموحدة والنهائية بدون تضارب)
 // =========================================================
+        // 11. غرف ونظام الشات المطور المتكامل (النسخة النهائية الفائقة والمضمونة)
+        // =========================================================
 
-function toggleChatWindow() { 
-    const chatWindow = document.getElementById('chat-window');
-    if (!chatWindow) return;
+        function toggleChatWindow() { 
+            const chatWindow = document.getElementById('chat-window');
+            if (!chatWindow) return;
 
-    // تبديل حالة الظهور (إظهار / إخفاء)
-    chatWindow.classList.toggle('hidden'); 
+            chatWindow.classList.toggle('hidden'); 
 
-    // إذا أصبحت نافذة الشات مفتوحة وظاهرة للعميل
-    if (!chatWindow.classList.contains('hidden')) {
-        
-        // 1. تحميل وجلب أرشيف الرسائل من السيرفر فوراً ليعرض على الشاشة
-        loadChatHistory(); 
+            if (!chatWindow.classList.contains('hidden')) {
+                // 1. تحميل وجلب أرشيف الرسائل من السيرفر فوراً عند الفتح
+                loadChatHistory(); 
 
-        // 2. ضبط النزول التلقائي للسكرول لآخر رسالة بالأسفل
-        let box = document.getElementById('chat-messages-box');
-        if (box) {
-            box.scrollTop = box.scrollHeight;
-        }
-
-        // 3. تشغيل التحديث الدوري كل 5 ثوانٍ لجلب ردود الإدارة تلقائياً
-        if (window.chatTimer) clearInterval(window.chatTimer);
-        window.chatTimer = setInterval(loadChatHistory, 5000);
-
-    } else {
-        // إذا قام العميل بقفل نافذة الشات، يتم إيقاف المؤقت فوراً لتوفير موارد المتصفح
-        if (window.chatTimer) {
-            clearInterval(window.chatTimer);
-        }
-    }
-}
-async function loadChatHistory() {
-    if (!currentUserEmail) return;
-    try {
-        // جلب الأرشيف من السيرفر بناءً على إيميل المستخدم الحالي
-        let res = await fetch(`${API_URL}?action=getChatHistory&userEmail=${encodeURIComponent(currentUserEmail)}`);
-        let messages = await res.json();
-
-        // الحاوية الحقيقية والموجودة في تصميمك لعرض الرسائل
-        let container = document.getElementById('chat-messages-box');
-        if (!container) return;
-        
-        container.innerHTML = ''; // تفريغ الشات قبل بناء الرسائل الجديدة لمنع التكرار
-
-        // التأكد من أن السيرفر أعاد مصفوفة رسائل صالحة
-        if (Array.isArray(messages) && messages.length > 0) {
-            messages.forEach(msg => {
-                // 👈 هنا السر: قراءة الحروف الصغيرة بالظبط زي ما صورتك في السيرفر بتبعتها
-                let text = msg.messageText || "";
-                let sender = msg.sender || "USER";
-                let timestamp = msg.timestamp || "";
-
-                // التحقق من هوية الراسل (هل هو العميل الحالي USER أم الإدارة؟)
-                let isMe = (sender.toString().toUpperCase() === "USER");
-
-                let msgHtml = '';
-                if (isMe) {
-                    // تصميم رسالة العميل (أنت)
-                    msgHtml = `
-                        <div class="flex flex-col mb-4 items-start animate-fade-in">
-                            <span class="font-black text-[10px] text-gray-400 mb-1 px-2">أنا (مستعمل)</span>
-                            <div class="max-w-[80%] p-3 rounded-2xl text-sm font-semibold leading-relaxed shadow-sm border bg-indigo-50 text-indigo-950 border-indigo-100 rounded-bl-none">
-                                ${text}
-                            </div>
-                        </div>`;
-                } else {
-                    // تصميم رسالة الإدارة / الدعم الفني
-                    msgHtml = `
-                        <div class="flex flex-col mb-4 items-end animate-fade-in">
-                            <span class="font-black text-[10px] text-gray-400 mb-1 px-2">الدعم الفني</span>
-                            <div class="max-w-[80%] p-3 rounded-2xl text-sm font-semibold leading-relaxed shadow-sm border bg-white text-slate-800 border-slate-100 rounded-br-none">
-                                ${text}
-                            </div>
-                        </div>`;
+                // 2. ضبط النزول التلقائي للسكرول لآخر رسالة
+                let box = document.getElementById('chat-messages-box');
+                if (box) {
+                    box.scrollTop = box.scrollHeight;
                 }
-                container.insertAdjacentHTML('beforeend', msgHtml);
-            });
-        } else {
-            // إذا كان الشات فارغاً تماماً
-            container.innerHTML = `<p class="text-center text-gray-400 py-6 font-medium leading-relaxed bg-white border border-gray-100 rounded-2xl p-4 shadow-sm mx-2">مرحباً بك!<br>لا توجد مراسلات سابقة، اكتب رسالتك لتصل فوراً.</p>`;
+
+                // 3. تشغيل التحديث الدوري كل 4 ثوانٍ لجلب ردود الإدارة تلقائياً
+                if (window.chatTimer) clearInterval(window.chatTimer);
+                window.chatTimer = setInterval(loadChatHistory, 4000);
+
+            } else {
+                // إيقاف المؤقت فوراً عند إغلاق الشات لتوفير موارد المتصفح
+                if (window.chatTimer) {
+                    clearInterval(window.chatTimer);
+                    window.chatTimer = null;
+                }
+            }
         }
 
-        // سحب السكرول لآخر رسالة تلقائياً عشان العميل يشوف الرسائل الجديدة فوراً
-        container.scrollTop = container.scrollHeight;
+        async function loadChatHistory() {
+            if (!currentUserEmail) return;
+            try {
+                // استخدام encodeURIComponent للتأكد من إرسال الإيميل للسيرفر بشكل مشفر وصحيح (بدون تشويه بسبب الـ @)
+                let res = await fetch(`${API_URL}?action=getChatHistory&userEmail=${encodeURIComponent(currentUserEmail)}`);
+                let messages = await res.json();
 
-    } catch (err) {
-        console.log("خطأ في تحديث وعرض الشات الدوري:", err);
-    }
-}
-function showChatWindow() {
-    document.getElementById('chat-backdrop').classList.remove('hidden');
-    document.getElementById('chat-sidebar').classList.remove('translate-x-full');
-    
-    loadChatHistory(); // تحميل الرسائل فوراً بمجرد الفتح
-    
-    if (window.chatTimer) clearInterval(window.chatTimer);
-    window.chatTimer = setInterval(loadChatHistory, 5000);
-}
+                let container = document.getElementById('chat-messages-box');
+                if (!container) return;
+                
+                container.innerHTML = ''; // تفريغ الشات قبل بناء الرسائل الجديدة لمنع التكرار
 
-function hideChatWindow() {
-    document.getElementById('chat-backdrop').classList.add('hidden');
-    document.getElementById('chat-sidebar').classList.add('translate-x-full');
-    
-    if (window.chatTimer) {
-        clearInterval(window.chatTimer);
-    }
-}
+                if (Array.isArray(messages) && messages.length > 0) {
+                    messages.forEach(msg => {
+                        // حماية مزدوجة: يقرأ الحروف الصغيرة (الموجودة في سيرفرك حالياً) والكبيرة كاحتياط قاطع
+                        let text = msg.messageText || msg.MessageText || "";
+                        let sender = msg.sender || msg.Sender || "USER";
+                        let timestamp = msg.timestamp || msg.Timestamp || "";
 
-async function sendChatMessage() {
-    let input = document.getElementById('chat-input-text');
-    let txt = input.value.trim();
-    if (!txt) return;
-    if (!currentUserEmail) return showToast("برجاء تسجيل الدخول أولاً لتتمكن من مراسلة الإدارة الفورية!", "error");
+                        // التحقق من هوية الراسل
+                        let isMe = (sender.toString().toUpperCase() === "USER");
 
-    if (window.chatTimer) clearInterval(window.chatTimer);
+                        let msgHtml = '';
+                        if (isMe) {
+                            // تصميم رسالة العميل (أنت)
+                            msgHtml = `
+                                <div class="flex flex-col mb-4 items-start animate-fade-in">
+                                    <span class="font-black text-[10px] text-indigo-600 mb-1 px-2">أنا (مستعمل)</span>
+                                    <div class="max-w-[80%] p-3 rounded-2xl text-sm font-semibold leading-relaxed shadow-sm border bg-indigo-50 text-indigo-950 border-indigo-100 rounded-bl-none">
+                                        ${text}
+                                    </div>
+                                </div>`;
+                        } else {
+                            // تصميم رسالة الإدارة / الدعم الفني
+                            msgHtml = `
+                                <div class="flex flex-col mb-4 items-end animate-fade-in">
+                                    <span class="font-black text-[10px] text-gray-500 mb-1 px-2">الدعم الفني</span>
+                                    <div class="max-w-[80%] p-3 rounded-2xl text-sm font-semibold leading-relaxed shadow-sm border bg-white text-slate-800 border-slate-100 rounded-br-none">
+                                        ${text}
+                                    </div>
+                                </div>`;
+                        }
+                        container.insertAdjacentHTML('beforeend', msgHtml);
+                    });
+                } else {
+                    // إذا كان الشات فارغاً تماماً
+                    container.innerHTML = `<p class="text-center text-gray-400 py-6 font-medium leading-relaxed bg-white border border-gray-100 rounded-2xl p-4 shadow-sm mx-2">مرحباً بك!<br>لا توجد مراسلات سابقة، اكتب رسالتك لتصل فوراً.</p>`;
+                }
 
-    let msgData = { 
-        action: "sendChatMessage", 
-        UserEmail: currentUserEmail,   
-        Sender: "USER",                 
-        MessageText: txt                
-    };
-    input.value = ''; // تنظيف حقل الإدخال فوراً لتجربة مستخدم سريعة
+                // سحب السكرول لآخر رسالة تلقائياً ليراها المستخدم فوراً
+                container.scrollTop = container.scrollHeight;
 
-    try {
-        await fetch(API_URL, { 
-            method: 'POST', 
-            headers: { 'Content-Type': 'text/plain;charset=UTF-8' }, 
-            body: JSON.stringify(msgData)
-        });
-        await loadChatHistory(); // إعادة تحميل الأرشيف فوراً لتظهر رسالتك الجديدة في الحال
-    } catch(e) {
-        console.log("خطأ إرسال رسالة الشات:", e);
-    } finally {
-        window.chatTimer = setInterval(loadChatHistory, 5000);
-    }
-}
-        window.onload = initApp;
+            } catch (err) {
+                console.log("خطأ في تحديث وعرض الشات الدوري:", err);
+            }
+        }
+
+        function showChatWindow() {
+            document.getElementById('chat-backdrop').classList.remove('hidden');
+            document.getElementById('chat-sidebar').classList.remove('translate-x-full');
+            
+            loadChatHistory(); // تحميل الرسائل فوراً بمجرد الفتح
+            
+            if (window.chatTimer) clearInterval(window.chatTimer);
+            window.chatTimer = setInterval(loadChatHistory, 4000);
+        }
+
+        function hideChatWindow() {
+            document.getElementById('chat-backdrop').classList.add('hidden');
+            document.getElementById('chat-sidebar').classList.add('translate-x-full');
+            
+            if (window.chatTimer) {
+                clearInterval(window.chatTimer);
+            }
+        }
+
+        async function sendChatMessage() {
+            let input = document.getElementById('chat-input-text');
+            let txt = input.value.trim();
+            if (!txt) return;
+            if (!currentUserEmail) return showToast("برجاء تسجيل الدخول أولاً لتتمكن من مراسلة الإدارة الفورية!", "error");
+
+            if (window.chatTimer) clearInterval(window.chatTimer);
+
+            // نرسل الحروف الصغيرة والكبيرة معاً لنحافظ على دالة الإرسال الشغالة عندك دون تعديل
+            let msgData = { 
+                action: "sendChatMessage", 
+                userEmail: currentUserEmail,
+                UserEmail: currentUserEmail,   
+                sender: "USER",
+                Sender: "USER",                 
+                messageText: txt,
+                MessageText: txt                
+            };
+            input.value = ''; // تنظيف حقل الإدخال فوراً لتجربة مستخدم فائقة السرعة
+
+            try {
+                await fetch(API_URL, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'text/plain;charset=UTF-8' }, 
+                    body: JSON.stringify(msgData)
+                });
+                // ✨ الإصلاح المنتظر: سحب وعرض المحادثة فوراً بعد الإرسال لتشاهد رسالتك في نفس اللحظة على الشاشة!
+                await loadChatHistory(); 
+            } catch(e) {
+                console.log("خطأ إرسال رسالة الشات:", e);
+            } finally {
+                // إعادة تنشيط التحديث الدوري بانتظام
+                window.chatTimer = setInterval(loadChatHistory, 4000);
+            }
+        }       window.onload = initApp;
     </script>
 </body>
 </html>
