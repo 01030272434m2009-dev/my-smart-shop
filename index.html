@@ -730,7 +730,7 @@ async function requestVerificationCode() {
             }
         }
 
-     async function loadChatHistory() {
+  async function loadChatHistory() {
     // التأكد من وجود الإيميل وتجهيزه ونزع أي مسافات زائدة منه
     if (!currentUserEmail) {
         console.log("❌ لا يمكن جلب الشات: إيميل المستخدم الحالي فارغ أو غير مسجل دخول!");
@@ -756,15 +756,30 @@ async function requestVerificationCode() {
 
         if (Array.isArray(messages) && messages.length > 0) {
             messages.forEach(msg => {
-                // قراءة مرنة ومزدوجة لكل الحالات المتوقعة من السيرفر (كبيرة أو صغيرة)
-                let text = msg.MessageText || msg.messageText || "";
-                let sender = msg.Sender || msg.sender || "USER";
+                // 🔍 [التعديل الذهبي]: قراءة نص الرسالة الفعلي من حقل Status بناءً على صورة الشيت
+                let text = msg.Status || "";
+                
+                // حماية احتياطية: لو حقل الستيتس فارغ أو تائه، جرب قراءة الحقل البديل
+                if (!text || text === "USER" || text === "ADMIN") {
+                    text = msg.MessageText || msg.messageText || "";
+                }
 
-                // التحقق من هوية الراسل (USER أو الإدارة)
-                let isMe = (sender.toString().toUpperCase().trim() === "USER");
+                // 🔍 [تحديد هوية الراسل]: عمود MessageText هو الذي يحتوي على نوع الحساب (USER أو ADMIN)
+                let senderType = msg.MessageText || msg.messageText || "";
+                let altSender = msg.Sender || msg.sender || "";
+
+                // العميل يعتبر هو صاحب الرسالة (isMe) إذا كان نوع الراسل USER
+                let isMe = (senderType.toString().toUpperCase().trim() === "USER") || 
+                           (altSender.toString().toUpperCase().trim() === "USER");
+
+                text = text.toString().trim();
+
+                // تخطي الأسطر غير المفهومة أو الفارغة تماماً
+                if (!text || text === "USER" || text === "ADMIN") return;
 
                 let msgHtml = '';
                 if (isMe) {
+                    // 🔵 رسالة العميل (تظهر على اليمين/اليسار حسب تصميم الويب عندك كـ مستعمل)
                     msgHtml = `
                         <div class="flex flex-col mb-4 items-start animate-fade-in">
                             <span class="font-black text-[10px] text-indigo-600 mb-1 px-2">أنا (مستعمل)</span>
@@ -773,6 +788,7 @@ async function requestVerificationCode() {
                             </div>
                         </div>`;
                 } else {
+                    // 🟢 رسالة الدعم الفني القادمة من الديسكتوب التابع للإدارة بفاقوس
                     msgHtml = `
                         <div class="flex flex-col mb-4 items-end animate-fade-in">
                             <span class="font-black text-[10px] text-gray-500 mb-1 px-2">الدعم الفني</span>
@@ -784,7 +800,7 @@ async function requestVerificationCode() {
                 container.insertAdjacentHTML('beforeend', msgHtml);
             });
         } else {
-            // رسالة تنبيهية إذا كانت المصفوفة فارغة
+            // رسالة تنبيهية إذا كانت مصفوفة المحادثات فارغة
             container.innerHTML = `<p class="text-center text-gray-400 py-6 font-medium leading-relaxed bg-white border border-gray-100 rounded-2xl p-4 shadow-sm mx-2">مرحباً بك!<br>لا توجد مراسلات سابقة، اكتب رسالتك لتصل فوراً.</p>`;
         }
 
@@ -792,10 +808,9 @@ async function requestVerificationCode() {
         container.scrollTop = container.scrollHeight;
 
     } catch (err) {
-        console.log("❌ خطأ أثناء جلب وعرض الشات الدوري:", err);
+        console.log("❌ خطأ أثناء جلب وعرض الشات الدوري على الويب:", err);
     }
 }
-
         function showChatWindow() {
             document.getElementById('chat-backdrop').classList.remove('hidden');
             document.getElementById('chat-sidebar').classList.remove('translate-x-full');
